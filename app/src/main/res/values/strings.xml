@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">JktOtw</string>
+
+    <!--Login Activity String-->
+    <string name="login_welcome">Welcome</string>
+    <string name="caption_login">Find location Point of Interest in Jakarta City easily</string>
+    <string name="email_hint_login">Email Address</string>
+    <string name="email_password_login">Password</string>
+    <string name="ime_login">Login</string>
+    <string name="button_text_login">Login</string>
 </resources>
