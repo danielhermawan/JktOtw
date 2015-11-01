@@ -7,10 +7,28 @@
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="InverseText">
+        <item name="android:textColor">@color/colorWhite</item>
 
+    </style>
     <!--Login activity style-->
-    <style name="LoginEditText">
+    <style name="InverseText.LoginEditText">
         <item name="android:background">@drawable/shape_edit_login</item>
         <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColorHint">@color/colorWhite</item>
+    </style>
+    <style name="InverseText.LoginTitleText">
+        <item name="android:textSize">40sp</item>
+    </style>
+    <style name="InverseText.LoginCaptionText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="InverseText.LoginButton">
+        <item name="android:background">@drawable/shape_button_login</item>
+    </style>
+    <style name="LoginTextLink">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/text_link</item>
     </style>
 </resources>
