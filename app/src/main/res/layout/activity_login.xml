@@ -41,6 +41,7 @@
                 android:textSize="25sp"
                 style="@style/InverseText"/>
             <EditText
+                android:id="@+id/name_field_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -50,6 +51,7 @@
                 android:hint="@string/name_register"
                 style="@style/InverseText.LoginEditText"/>
             <EditText
+                android:id="@+id/phone_field_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -59,6 +61,7 @@
                 android:hint="@string/phone_hint_login"
                 style="@style/InverseText.LoginEditText"/>
             <EditText
+                android:id="@+id/email_field_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -68,26 +71,30 @@
                 android:hint="@string/email_hint_login"
                 style="@style/InverseText.LoginEditText"/>
             <EditText
+                android:id="@+id/password_field_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginLeft="@dimen/login_horizontal_space"
                 android:layout_marginRight="@dimen/login_horizontal_space"
                 android:hint="@string/email_password_login"
-                android:imeActionLabel="@string/ime_login"
                 android:inputType="textPassword"
                 style="@style/InverseText.LoginEditText"/>
             <EditText
+                android:id="@+id/repassword_field_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginLeft="@dimen/login_horizontal_space"
                 android:layout_marginRight="@dimen/login_horizontal_space"
                 android:hint="@string/confirm_password_login"
-                android:imeActionLabel="@string/ime_login"
+                android:imeActionLabel="@string/register"
+                android:imeActionId="@+id/login"
+                android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"
                 style="@style/InverseText.LoginEditText"/>
             <Button
+                android:id="@+id/button_register"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -100,7 +107,8 @@
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

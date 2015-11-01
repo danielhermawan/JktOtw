@@ -42,7 +42,7 @@ public class HomeActivity extends AppCompatActivity {
 
     }
     private void checkSkippedLogin() {
-        if (SharedPreference.getSkipLogin(this)) {
+        if (!SharedPreference.getSkipLogin(this)) {
             Intent i = new Intent(this,LoginActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);

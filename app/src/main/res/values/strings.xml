@@ -30,5 +30,8 @@
     </string>
     <string name="password_error">This password is too short</string>
     <string name="email_error">Email Invalid</string>
+    <string name="repassword_error">Both password field not same</string>
+    <string name="phone_error">Format phone number is not valid</string>
+    <string name="name_error">Name length cannot be less than 3 character</string>
 
 </resources>
