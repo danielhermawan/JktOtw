@@ -4,7 +4,13 @@
     <color name="colorPrimaryDark">#01579b</color>
     <color name="colorAccent">#FFB200</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorTextContent">#4C4A4F</color>
     <color name="colorButtonLogin">#00E47C</color>
     <color name="colorButtonLoginPressed">#69f0ae</color>
+    <color name="colorNavigationIcon">#A5E2DB</color>
+    <color name="colorTransparent">#00000000</color>
+    <color name="colorTransparent40">#66000000</color>
+    <color name="colorDivider">#E6E6E6</color>
 </resources>
 

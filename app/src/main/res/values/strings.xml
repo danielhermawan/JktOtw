@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">JktOtw</string>
-
     <!--Login Activity String-->
     <string name="login_welcome">Welcome</string>
     <string name="caption_login">Find location Point of Interest in Jakarta City easily</string>
@@ -15,23 +13,30 @@
     <string name="name_register">Name</string>
     <string name="phone_hint_login">Phone Number</string>
     <string name="confirm_password_login">Confirm Password</string>
-
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
     <string name="password_error">This password is too short</string>
     <string name="email_error">Email Invalid</string>
     <string name="repassword_error">Both password field not same</string>
     <string name="phone_error">Format phone number is not valid</string>
     <string name="name_error">Name length cannot be less than 3 character</string>
 
+    <string name="app_name">JktOtw</string>
+    <string name="discover">Discover</string>
+    <string name="navigation_item_home">HOME</string>
+    <string name="navigation_item_login">LOGIN</string>
+    <string name="navigation_item_search">SEARCH</string>
+    <string name="navigation_item_map">MAPS</string>
+    <string name="navigation_item_help">HELP</string>
+    <string name="navigation_item_food"><![CDATA[FOOD & DRINKS]]></string>
+    <string name="navigation_item_entertaiment">ENTERTAINMENT</string>
+    <string name="navigation_item_atm"><![CDATA[ATM & BANKS]]></string>
+    <string name="navigation_item_hotel">HOTEL</string>
+    <string name="navigation_item_shooping">SHOPPING</string>
+    <string name="navigation_item_hotspot">INDOSAT HOTSPOTS</string>
+    <string name="category_entertaiment">Entertaiment</string>
+    <string name="category_bank"><![CDATA[Atm & Banks]]></string>
+    <string name="category_hotel">Hotel</string>
+    <string name="category_shopping">Shooping</string>
+    <string name="category_hospital">Hospital</string>
+    <string name="category_indosat">Indosat Hotspot</string>
+    <string name="navigation_item_hospital">HOSPITAL</string>
 </resources>

@@ -3,9 +3,8 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
     defaultConfig {
-        applicationId "favesolution.com.jktotw"
+        applicationId 'com.favesolution.jktotw'
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -17,6 +16,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 repositories {
     maven {url "https://clojars.org/repo/"}
@@ -25,6 +26,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.android.support:recyclerview-v7:23.1.0'
     compile 'com.google.android.gms:play-services-location:8.1.0'
     compile 'com.google.android.gms:play-services-maps:8.1.0'
     compile 'com.android.support:design:23.1.0'
@@ -36,5 +38,4 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.github.frankiesardo:icepick:2.3.6'
     provided 'com.github.frankiesardo:icepick-processor:2.3.6'
-
 }

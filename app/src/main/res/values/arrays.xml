@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="categories">
+        <item>@string/category_entertaiment</item>
+        <item>@string/category_bank</item>
+        <item>@string/category_hotel</item>
+        <item>@string/category_shopping</item>
+        <item>@string/category_hospital</item>
+        <item>@string/category_indosat</item>
+    </array>
+</resources>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/bitmap_background_login"
-    tools:context="favesolution.com.jktotw.Activities.LoginActivity"
+    tools:context="com.com.jktotw.Activities.LoginActivity"
     android:gravity="center_horizontal"
     style="@style/Base.TextAppearance.AppCompat.Headline">
     <ProgressBar

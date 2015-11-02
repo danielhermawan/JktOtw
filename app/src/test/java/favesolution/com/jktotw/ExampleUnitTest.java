@@ -1,4 +1,4 @@
-package favesolution.com.jktotw;
+package com.favesolution.jktotw;
 
 import org.junit.Test;
 
