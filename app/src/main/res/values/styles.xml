@@ -10,13 +10,13 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
     <style name="InverseText">
         <item name="android:textColor">@color/colorWhite</item>
-
     </style>
-    <style name="CategoryListText">
-        <item name="android:textSize">16sp</item>
+    <style name="BlackText">
         <item name="android:textColor">@color/colorTextContent</item>
     </style>
-    <!--Login activity style-->
+    <style name="BlackText.CategoryListText">
+        <item name="android:textSize">16sp</item>
+    </style>
     <style name="InverseText.LoginEditText">
         <item name="android:background">@drawable/shape_edit_login</item>
         <item name="android:gravity">center_horizontal</item>
@@ -36,4 +36,23 @@
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/text_link</item>
     </style>
+    <style name="BlackText.ButtonDetail">
+        <item name="android:background">@drawable/state_button_detail</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="TitleInfo">
+        <item name="android:textColor">#4F4D52</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="AddressInfo">
+        <item name="android:textColor">#4E4D52</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="RatingNumber">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
 </resources>

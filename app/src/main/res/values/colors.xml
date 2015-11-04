@@ -11,6 +11,7 @@
     <color name="colorNavigationIcon">#A5E2DB</color>
     <color name="colorTransparent">#00000000</color>
     <color name="colorTransparent40">#66000000</color>
-    <color name="colorDivider">#E6E6E6</color>
+    <color name="colorDivider">#E5E5E5</color>
+    <color name="colorBorderButton">#CCCCCC</color>
 </resources>
 

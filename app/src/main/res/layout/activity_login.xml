@@ -171,7 +171,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:divider="@drawable/shape_divider"
+                android:divider="@drawable/shape_divider_horizontal"
                 android:showDividers="middle"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_marginLeft="@dimen/login_horizontal_space"

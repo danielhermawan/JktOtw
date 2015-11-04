@@ -162,13 +162,6 @@ public class ListPlacesFragment extends Fragment {
             RequestQueueSingleton.getInstance(getActivity())
                     .getRequestQueue()
                     .cancelAll(this);
-            //TODO: Set radius programaticaly dan juga ada option pakai radius atau ngak
-            //TODO: Indosat hotspot
-            //TODO: Default if no place was found
-            //todo: page token
-            //todo: tambahin menu search
-            //todo: sementara distance pakai rumus dulu aja baru nanti ganti pakai webservice
-            //todo: pencet back dari homebutton dari detail malah reload lagi
             final String url = NetworkHelper.searchNearbyPlace(mCurrentLocation, mCategoryFilter);
             CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
                 @Override

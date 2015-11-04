@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="wrap_content">
     <FrameLayout
         android:layout_width="0dp"
         android:background="@drawable/state_category_decoration"
@@ -21,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            style="@style/CategoryListText"/>
+            style="@style/BlackText.CategoryListText"/>
         <ImageView
             android:foregroundTint="@color/colorTransparent40"
             android:layout_width="wrap_content"
