@@ -1,7 +1,7 @@
 <resources>
     <!--Login Activity String-->
     <string name="login_welcome">Welcome</string>
-    <string name="caption_login">Find location Point of Interest in Jakarta City easily</string>
+    <string name="caption_login">Find location Point of Interest in around you place easily</string>
     <string name="email_hint_login">Email Address</string>
     <string name="email_password_login">Password</string>
     <string name="ime_login">Login</string>
@@ -39,4 +39,15 @@
     <string name="category_hospital">Hospital</string>
     <string name="category_indosat">Indosat Hotspot</string>
     <string name="navigation_item_hospital">HOSPITAL</string>
+    <string name="browse_with_ar">Browse with AR</string>
+    <string name="title_activity_list_places">ListPlacesActivity</string>
+    <string name="category_food"><![CDATA[Food & Drinks]]></string>
+    <string name="near_you">Near You</string>
+    <string name="find_on_map">Find on Map</string>
+    <string name="email_exists">Email already exists</string>
+    <string name="Register_Success">Register Success</string>
+    <string name="login_Success">Login Success</string>
+    <string name="navigation_item_profile">PROFILE</string>
+    <string name="navigation_item_logout">LOGOUT</string>
+    <string name="title_activity_detail_place">DetailPlaceActivity</string>
 </resources>

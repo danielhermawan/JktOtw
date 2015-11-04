@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,22 +15,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
+import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.favesolution.jktotw.Helpers.CustomJsonRequest;
+import com.favesolution.jktotw.Helpers.NetworkHelper;
+import com.favesolution.jktotw.Helpers.RequestQueueSingleton;
+import com.favesolution.jktotw.Helpers.SharedPreference;
+import com.favesolution.jktotw.R;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.favesolution.jktotw.Helpers.CustomJsonRequest;
-import com.favesolution.jktotw.Helpers.NetworkHelper;
-import com.favesolution.jktotw.Helpers.RequestQueueSingleton;
-import com.favesolution.jktotw.Helpers.SharedPreference;
-import com.favesolution.jktotw.R;
 import icepick.Icepick;
 
 public class LoginActivity extends AppCompatActivity {
@@ -128,11 +132,11 @@ public class LoginActivity extends AppCompatActivity {
         mEmailRegisterField.setError(null);
         mPasswordRegisterField.setError(null);
         mRepasswordField.setError(null);
-        String email = mEmailRegisterField.getText().toString();
-        String phone= mPhoneField.getText().toString();
-        String name = mNameField.getText().toString();
-        String password = mPasswordRegisterField.getText().toString();
-        String repassword = mRepasswordField.getText().toString();
+        final String email = mEmailRegisterField.getText().toString();
+        final String phone= mPhoneField.getText().toString();
+        final String name = mNameField.getText().toString();
+        final String password = mPasswordRegisterField.getText().toString();
+        final String repassword = mRepasswordField.getText().toString();
         boolean cancel = false;
         View focusView = null;
         if (!repassword.equals(password)) {
@@ -164,29 +168,42 @@ public class LoginActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put("name",name);
-            params.put("email", email);
-            params.put("phone", phone);
-            params.put("password", password);
-            CustomJsonRequest requestRegister = new CustomJsonRequest(Request.Method.POST, NetworkHelper.BASE_URL, new JSONObject(params),
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            showProgress(false);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
 
-                        }
-                    });
-            requestRegister.setTag(this);
-            requestRegister.setPriority(Request.Priority.HIGH);
-           // RequestQueueSingleton.getInstance(this).addToRequestQueue(requestRegister);
-            //TODO: Register user with web service
         }
+        HashMap<String, String> params = new HashMap<>();
+        params.put("nama",name);
+        params.put("email", email);
+        params.put("noHP", phone);
+        params.put("password", password);
+        CustomJsonRequest requestRegister = new CustomJsonRequest( Method.POST,NetworkHelper.registerUser(),params,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        showProgress(false);
+                        try {
+                            if (response.getString("status").equalsIgnoreCase("error")) {
+                                mEmailRegisterField.setError(response.getString("message"));
+                            } else {
+                                Toast.makeText(LoginActivity.this, R.string.Register_Success,Toast.LENGTH_LONG).show();
+                                mIsRegisterOpen = false;
+                                changeForm();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(LoginActivity.this,"Network error", Toast.LENGTH_SHORT).show();
+                        Log.e("error",error.networkResponse.statusCode+"");
+                        showProgress(false);
+                    }
+                });
+        requestRegister.setTag(this);
+        requestRegister.setPriority(Request.Priority.HIGH);
+        RequestQueueSingleton.getInstance(this).addToRequestQueue(requestRegister);
     }
     private void attemptLogin() {
         mEmailEditLogin.setError(null);
@@ -209,7 +226,41 @@ public class LoginActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            //TODO: login user with web service using Volley
+            HashMap<String, String> params = new HashMap<>();
+            params.put("email", email);
+            params.put("password", password);
+            CustomJsonRequest loginRequest = new CustomJsonRequest(Method.POST, NetworkHelper.loginUser(), params,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            showProgress(false);
+                            try {
+                                if (response.getString("status").equalsIgnoreCase("error")) {
+                                    mEmailEditLogin.setError(response.getString("message"));
+                                } else {
+                                    SharedPreference.setUserToken(LoginActivity.this,response.getString("token"));
+                                    Toast.makeText(LoginActivity.this, R.string.login_Success,Toast.LENGTH_LONG).show();
+                                    Intent i = new Intent(LoginActivity.this,MainActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
+                                    finish();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(LoginActivity.this,"Network error", Toast.LENGTH_SHORT).show();
+                            Log.e("error",error.getMessage());
+                            showProgress(false);
+                        }
+                    });
+            loginRequest.setTag(this);
+            loginRequest.setPriority(Request.Priority.HIGH);
+            RequestQueueSingleton.getInstance(this).addToRequestQueue(loginRequest);
         }
     }
     private void changeForm() {
@@ -264,9 +315,6 @@ public class LoginActivity extends AppCompatActivity {
         return password.length() > 4;
     }
     private boolean isPhoneValid(String phone) {
-        if (TextUtils.isDigitsOnly(phone)&& (phone.length() ==11 || phone.length() == 12)) {
-            return true;
-        }
-        return false;
+        return TextUtils.isDigitsOnly(phone) && (phone.length() == 11 || phone.length() == 12);
     }
 }

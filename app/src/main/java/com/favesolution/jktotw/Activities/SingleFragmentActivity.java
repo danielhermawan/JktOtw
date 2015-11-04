@@ -7,9 +7,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewConfiguration;
 
-import java.lang.reflect.Field;
-
 import com.favesolution.jktotw.R;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by Daniel on 6/12/2015.

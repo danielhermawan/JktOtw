@@ -12,6 +12,10 @@
             android:checkable="false"
             android:icon="@drawable/ic_lock_outline_white_24dp"/>
         <item
+            android:id="@+id/navigation_item_profile"
+            android:title="@string/navigation_item_profile"
+            android:icon="@drawable/ic_account_circle_white_24dp"/>
+        <item
             android:id="@+id/navigation_item_search"
             android:title="@string/navigation_item_search"
             android:icon="@drawable/ic_search_white_24dp"/>
@@ -51,5 +55,9 @@
             android:id="@+id/navigation_item_help"
             android:title="@string/navigation_item_help"
             android:icon="@drawable/ic_help_outline_white_24dp"/>
+        <item
+            android:id="@+id/navigation_item_logout"
+            android:title="@string/navigation_item_logout"
+            android:icon="@drawable/ic_lock_open_white_24dp"/>
     </group>
 </menu>

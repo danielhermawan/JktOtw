@@ -23,7 +23,7 @@ public class SharedPreference {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREF_USER_TOKEN,null);
     }
-    public static void setSkipLogin(Context context,String userToken) {
+    public static void setUserToken(Context context,String userToken) {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString(PREF_USER_TOKEN,userToken)

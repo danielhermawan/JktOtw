@@ -1,7 +1,6 @@
 package com.favesolution.jktotw.Activities;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -10,20 +9,20 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+
+import com.favesolution.jktotw.Fragments.HomeFragment;
+import com.favesolution.jktotw.Helpers.SharedPreference;
+import com.favesolution.jktotw.Helpers.UIHelper;
+import com.favesolution.jktotw.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.favesolution.jktotw.Fragments.HomeFragment;
-import com.favesolution.jktotw.Helpers.SharedPreference;
-import com.favesolution.jktotw.R;
 
 public class MainActivity extends AppCompatActivity {
     @Bind(R.id.toolbar) Toolbar mToolbar;
@@ -61,12 +60,45 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.navigation_item_home:
                         setActiveContent(HomeFragment.newInstance());
                         return true;
+                    case R.id.navigation_item_food:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 0));
+                        return true;
+                    case R.id.navigation_item_entertaiment:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 1));
+                        return true;
+                    case R.id.navigation_item_atm:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 2));
+                        return true;
+                    case R.id.navigation_item_hotel:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 3));
+                        return true;
+                    case R.id.navigation_item_shooping:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 4));
+                        return true;
+                    case R.id.navigation_item_hospital:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 5));
+                        return true;
+                    case R.id.navigation_item_hotspot:
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 6));
+                        return true;
+                    case R.id.navigation_item_profile:
+                        return true;
+                    case R.id.navigation_item_logout:
+                        SharedPreference.setUserToken(MainActivity.this, null);
+                        //TODO: Erase token from database server
+                        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                        return true;
                     default:
                         return true;
                 }
             }
         });
         setActiveContent(HomeFragment.newInstance());
+        checkNavigationMenu();
+        UIHelper.showOverflowMenu(this);
         //todo: change menu to display programtilly
     }
     @Override
@@ -87,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.closeDrawers();
     }
     private void checkSkippedLogin() {
-        if (!SharedPreference.getSkipLogin(this)) {
+        if (!SharedPreference.getSkipLogin(this)&& SharedPreference.getUserToken(this)==null) {
             Intent i = new Intent(this,LoginActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
@@ -95,5 +127,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    private void checkNavigationMenu() {
+        Menu menu = mNavigationView.getMenu();
+        if (SharedPreference.getUserToken(this) == null) {
+            menu.findItem(R.id.navigation_item_profile).setVisible(false);
+            menu.findItem(R.id.navigation_item_logout).setVisible(false);
+        } else {
+            menu.findItem(R.id.navigation_item_login).setVisible(false);
+        }
+    }
 }

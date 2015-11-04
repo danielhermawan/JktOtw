@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recyclerview"
+<RelativeLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="50dp"/>
+    <FrameLayout
+        android:id="@+id/browse_frame"
+        android:clickable="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@drawable/shape_browse_ar">
+        <TextView
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:textColor="@color/colorWhite"
+            android:layout_height="wrap_content"
+            android:text="@string/browse_with_ar"/>
+    </FrameLayout>
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bitmap_button_ar"
+        android:layout_alignTop="@+id/browse_frame"
+        android:layout_alignParentRight="true"
+        android:layout_alignRight="@+id/browse_frame"
+        android:layout_marginTop="-20dp"
+        android:layout_marginRight="16dp"/>
+</RelativeLayout>

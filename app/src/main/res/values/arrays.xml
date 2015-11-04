@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="categories">
+        <item>@string/category_food</item>
         <item>@string/category_entertaiment</item>
         <item>@string/category_bank</item>
         <item>@string/category_hotel</item>
@@ -8,4 +9,14 @@
         <item>@string/category_hospital</item>
         <item>@string/category_indosat</item>
     </array>
+    <array name="category_filter">
+        <item>Food|restaurant</item>
+        <item>amusement_park|movie_theater|shopping_mall|zoo|park|bowling_alley</item>
+        <item>atm|bank</item>
+        <item>lodging</item>
+        <item>grocery_or_supermarket|convenience_store|department_store|shopping_mall|store</item>
+        <item>hospital</item>
+        <item>indosat</item>
+    </array>
+
 </resources>

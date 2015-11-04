@@ -3,15 +3,14 @@ package com.favesolution.jktotw.Fragments;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
+import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Helpers.DividerItemDecoration;
 import com.favesolution.jktotw.R;
 
@@ -47,17 +46,19 @@ public class HomeFragment extends Fragment {
     private class CategoryHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         private TextView mTextView;
+        private int mPosition;
         public CategoryHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView.findViewById(R.id.category_text);
             itemView.setOnClickListener(this);
         }
-        public void bindCategoryItem(String category) {
+        public void bindCategoryItem(String category,int position) {
+            mPosition = position;
             mTextView.setText(category);
         }
         @Override
         public void onClick(View v) {
-
+            getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),mPosition));
         }
     }
 
@@ -69,14 +70,14 @@ public class HomeFragment extends Fragment {
         @Override
         public CategoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            View v = inflater.inflate(R.layout.list_home,parent,false);
+            View v = inflater.inflate(R.layout.list_categories,parent,false);
             return new CategoryHolder(v);
         }
 
         @Override
         public void onBindViewHolder(CategoryHolder holder, int position) {
             String category = mCategoryItems.getString(position);
-            holder.bindCategoryItem(category);
+            holder.bindCategoryItem(category,position);
         }
 
         @Override

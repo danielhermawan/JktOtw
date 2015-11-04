@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:id="@+id/content_frame"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-        <android.support.design.widget.FloatingActionButton
+        <!--<android.support.design.widget.FloatingActionButton
             android:id="@+id/ar_fab"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/fab_margin"
             android:src="@drawable/bitmap_button_ar"
-            app:fabSize="normal"/>
+            app:fabSize="normal"/>-->
     </android.support.design.widget.CoordinatorLayout>
     <android.support.design.widget.NavigationView
         android:background="#66000000"

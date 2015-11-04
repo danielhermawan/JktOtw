@@ -31,13 +31,36 @@
             android:value="AIzaSyBfLo0JRKPIXntd6HdktE_hreS2qghCGFc" />
 
         <activity android:name=".Activities.MainActivity" >
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+        <activity android:name=".Activities.LoginActivity" />
+        <activity
+            android:name=".Activities.ListPlacesActivity"
+            android:label="@string/title_activity_list_places"
+            android:parentActivityName=".Activities.MainActivity"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.DetailPlaceActivity"
+            android:label="@string/title_activity_detail_place"
+            android:parentActivityName=".Activities.ListPlacesActivity"
+            android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.ListPlacesActivity" />
         </activity>
-        <activity android:name=".Activities.LoginActivity" />
     </application>
 
 </manifest>
