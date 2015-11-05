@@ -24,8 +24,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DetailPlaceActivity;
 import com.favesolution.jktotw.Helpers.CustomJsonRequest;
-import com.favesolution.jktotw.Helpers.DividerItemDecoration;
 import com.favesolution.jktotw.Helpers.DisplayHelper;
+import com.favesolution.jktotw.Helpers.DividerItemDecoration;
 import com.favesolution.jktotw.Helpers.NetworkHelper;
 import com.favesolution.jktotw.Helpers.RequestQueueSingleton;
 import com.favesolution.jktotw.Models.Place;
@@ -222,7 +222,7 @@ public class ListPlacesFragment extends Fragment {
         }
         @Override
         public void onClick(View v) {
-            startActivity(DetailPlaceActivity.newIntent(getActivity(),mPlace.getId()));
+            startActivity(DetailPlaceActivity.newIntent(getActivity(),mPlace.getId(),mPlace.getName()));
         }
     }
 

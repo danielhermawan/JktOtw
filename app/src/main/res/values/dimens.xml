@@ -6,4 +6,7 @@
 
     <!-- Login Activity Dimension-->
     <dimen name="login_horizontal_space">50dp</dimen>
+    <dimen name="image_photo_circle_height">100dp</dimen>
+    <dimen name="image_photo_circle_width">100dp</dimen>
+    <dimen name="map_static_width">100dp</dimen>
 </resources>

@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <FrameLayout
+        <fragment
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:id="@+id/map_place"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="@dimen/map_static_width"
             android:layout_alignParentTop="true"
-            android:background="@color/colorPrimary"/>
-        <ImageView
+            map:cameraZoom="13"
+            map:mapType="normal"
+            map:liteMode="true"
+            tools:ignore="MissingPrefix"/>
+        <!--<FrameLayout
+            android:id="@+id/map_place"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/map_static_width"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorPrimary"/>-->
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/image_place"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/image_photo_circle_width"
+            android:layout_height="@dimen/image_photo_circle_height"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginTop="-32dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/map_place"
-            android:src="@drawable/bitmap_sample_places_large"
-            android:scaleType="centerCrop"/>
+            android:src="@drawable/bitmap_sample_places_large"/>
         <LinearLayout
             android:id="@+id/content_info"
             android:layout_width="wrap_content"
@@ -35,15 +47,13 @@
                 android:id="@+id/text_name_place"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Plaza Indonesia"
                 style="@style/TitleInfo"/>
             <TextView
                 android:id="@+id/text_address_place"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                style="@style/AddressInfo"
-                android:text="Jalan M.H. Thamrin No.28-30 Jakarta Pusat, DKI Jakarta 10350"/>
+                style="@style/AddressInfo"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -54,12 +64,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="@style/RatingNumber"
-                    android:text="7.2"/>
+                    android:layout_marginRight="6dp"/>
                 <RatingBar
                     android:id="@+id/rating_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="6dp"
                     android:layout_marginRight="6dp"
                     android:layout_marginTop="1dp"
                     android:numStars="5"
@@ -164,8 +173,7 @@
                     android:textSize="18sp"
                     android:textColor="#212121"
                     android:layout_alignRight="@id/arrow_photo_right"
-                    android:layout_marginRight="32dp"
-                    android:text="32"/>
+                    android:layout_marginRight="32dp"/>
             </RelativeLayout>
             <RelativeLayout
                 android:layout_width="match_parent"

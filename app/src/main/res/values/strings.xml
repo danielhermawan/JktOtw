@@ -62,7 +62,8 @@
         Search nearby:<b> %s</b>
         ]]>
     </string>
-    <string name="photos_number">Photos (%s)</string>
-    <string name="related_place_number">Related Places (%s)</string>
-    <string name="reviews_number">Reviews (%s)</string>
+    <string name="photos_number">Photos (%d)</string>
+    <string name="related_place_number">Related Places (%d)</string>
+    <string name="reviews_number">Reviews (%d)</string>
+    <string name="no_rating">No one rating it yet</string>
 </resources>
