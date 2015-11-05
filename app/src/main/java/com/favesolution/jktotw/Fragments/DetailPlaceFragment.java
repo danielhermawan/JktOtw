@@ -26,8 +26,12 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -55,6 +59,7 @@ public class DetailPlaceFragment extends Fragment
     private String mPhone;
     private int mType;
     private GoogleMap mMap;
+    @Bind(R.id.map_place) MapView mMapView;
     @Bind(R.id.text_search_nearby) TextView mTextSearchNearby;
     @Bind(R.id.text_name_place) TextView mTextNamePlace;
     @Bind(R.id.text_address_place) TextView mTextAddressPlace;
@@ -94,25 +99,36 @@ public class DetailPlaceFragment extends Fragment
         mTextPhoto.setText(getString(R.string.photos_number, 0));
         mTextCountPhoto.setText(0 + "");
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
-        /*SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager()
-                .findFragmentById(R.id.map_place);
-        mMap = mapFragment.getMap();
-       *//* mapFragment.getMapAsync(new OnMapReadyCallback() {
+        mMapView.onCreate(savedInstanceState);
+        MapsInitializer.initialize(getActivity());
+        mMapView.setClickable(false);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mMap = googleMap;
-                if (mPlace != null) {
+                mMap.getUiSettings().setMapToolbarEnabled(false);
+                if(mPlace!=null)
                     updateMap();
-                }
             }
-        });*/
+        });
         return v;
     }
-
     @Override
     public void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapView.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        mMapView.onResume();
+        super.onResume();
     }
 
     @Override
@@ -121,6 +137,17 @@ public class DetailPlaceFragment extends Fragment
         mGoogleApiClient.disconnect();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mMapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -179,7 +206,9 @@ public class DetailPlaceFragment extends Fragment
 
     }
     private void updateMap() {
-        mMap.addMarker(new MarkerOptions().position(mPlace.getLatLng()));
+        mMap.addMarker(new MarkerOptions().position(mPlace.getLatLng()).title((String) mPlace.getName()));
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mPlace.getLatLng(), 13);
+        mMap.animateCamera(cameraUpdate);
     }
     private int getType(int type) {
         switch (type) {

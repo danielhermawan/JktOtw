@@ -7,8 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <fragment
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <com.google.android.gms.maps.MapView
             android:id="@+id/map_place"
             android:layout_width="match_parent"
             android:layout_height="@dimen/map_static_width"
