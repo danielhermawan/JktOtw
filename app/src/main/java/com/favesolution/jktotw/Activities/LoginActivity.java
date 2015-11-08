@@ -21,9 +21,9 @@ import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.favesolution.jktotw.Helpers.CustomJsonRequest;
-import com.favesolution.jktotw.Helpers.NetworkHelper;
-import com.favesolution.jktotw.Helpers.RequestQueueSingleton;
+import com.favesolution.jktotw.NetworkUtils.CustomJsonRequest;
+import com.favesolution.jktotw.NetworkUtils.UrlEndpoint;
+import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
 import com.favesolution.jktotw.Helpers.SharedPreference;
 import com.favesolution.jktotw.R;
 
@@ -175,7 +175,7 @@ public class LoginActivity extends AppCompatActivity {
         params.put("email", email);
         params.put("noHP", phone);
         params.put("password", password);
-        CustomJsonRequest requestRegister = new CustomJsonRequest( Method.POST,NetworkHelper.registerUser(),params,
+        CustomJsonRequest requestRegister = new CustomJsonRequest( Method.POST, UrlEndpoint.registerUser(),params,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -229,7 +229,7 @@ public class LoginActivity extends AppCompatActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("email", email);
             params.put("password", password);
-            CustomJsonRequest loginRequest = new CustomJsonRequest(Method.POST, NetworkHelper.loginUser(), params,
+            CustomJsonRequest loginRequest = new CustomJsonRequest(Method.POST, UrlEndpoint.loginUser(), params,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {

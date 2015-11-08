@@ -66,4 +66,13 @@
     <string name="related_place_number">Related Places (%d)</string>
     <string name="reviews_number">Reviews (%d)</string>
     <string name="no_rating">No one rating it yet</string>
+    <string name="text_review">%d reviews</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="dialog_call">Do you want to call this number? \n\n%s</string>
+    <string name="ok">Ok</string>
+    <string name="no_number">This place has no number yet</string>
+    <string name="share_place">Visit %s \nVia JktOtw</string>
+    <string name="title_activity_map_place">MapPlaceActivity</string>
+    <string name="action_settings">Settings</string>
 </resources>

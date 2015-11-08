@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.NetworkUtils;
 
 import android.content.Context;
 

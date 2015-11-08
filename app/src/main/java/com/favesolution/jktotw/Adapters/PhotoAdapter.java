@@ -1,14 +1,11 @@
-package com.favesolution.jktotw.Adapter;
+package com.favesolution.jktotw.Adapters;
 
-import android.content.Context;
-import android.location.Location;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.favesolution.jktotw.Helpers.PhotoTask;
+import com.favesolution.jktotw.NetworkUtils.PhotoTask;
 import com.favesolution.jktotw.R;
 
 import java.util.List;
@@ -30,7 +27,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
     public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = inflater.inflate(R.layout.list_image_circle,parent,false);
-        Log.d("debug","oncreate");
         return new PhotoHolder(v);
     }
 
@@ -44,24 +40,17 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
         return mPhotos.size();
     }
 
-    class PhotoHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    class PhotoHolder extends RecyclerView.ViewHolder {
         private PhotoTask.AttributedPhoto mPhoto;
         private CircleImageView mImageView;
         public PhotoHolder(View itemView) {
             super(itemView);
             mImageView = (CircleImageView) itemView.findViewById(R.id.item_image_circle);
-            itemView.setOnClickListener(this);
         }
         public void bindPhotoItems(PhotoTask.AttributedPhoto photo) {
             mPhoto = photo;
             mImageView.setImageBitmap(photo.bitmap);
-            Log.d(TAG,"bind photo");
         }
 
-        @Override
-        public void onClick(View v) {
-            Log.d(TAG,"clock");
-        }
     }
 }

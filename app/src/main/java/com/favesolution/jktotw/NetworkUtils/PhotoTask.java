@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.NetworkUtils;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -16,12 +16,12 @@ import java.util.List;
  * Created by Daniel on 11/5/2015 for JktOtw project.
  */
 public class PhotoTask  extends AsyncTask<String,Void,List<PhotoTask.AttributedPhoto>>{
-    private int mHeight;
-    private int mWidth;
+    private float mHeight;
+    private float mWidth;
     private int mNumber;
     private FinishLoadingAction mFinishLoadingAction;
     private GoogleApiClient mGoogleApiClient;
-    public PhotoTask(int width, int height,GoogleApiClient googleApiClient,int number) {
+    public PhotoTask(float width, float height,GoogleApiClient googleApiClient,int number) {
         mHeight = height;
         mWidth = width;
         mGoogleApiClient = googleApiClient;
@@ -57,7 +57,7 @@ public class PhotoTask  extends AsyncTask<String,Void,List<PhotoTask.AttributedP
                 for (int i = 0; i < numberPhoto; i++) {
                     PlacePhotoMetadata photo = photoMetadataBuffer.get(i);
                     CharSequence attribution = photo.getAttributions();
-                    Bitmap image = photo.getScaledPhoto(mGoogleApiClient, mWidth, mHeight).await()
+                    Bitmap image = photo.getScaledPhoto(mGoogleApiClient, (int)mWidth,(int) mHeight).await()
                             .getBitmap();
                     attributedPhotos.add(new AttributedPhoto(attribution, image,photoMetadataBuffer.getCount()));
                 }

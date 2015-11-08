@@ -1,14 +1,19 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.NetworkUtils;
 
 import android.location.Location;
 import android.net.Uri;
 
-public class NetworkHelper {
+public class UrlEndpoint {
     private static final String BASE_WEBSERVICE_URL = "http://favesolution.com/jktotw/";
     private static final String GOOGLE_SERVER_KEY = "AIzaSyDfVq9akzp7xLY3lzWKDFnFo8idWTBq9Pc";
     private static final String API_JKTOTW_KEY ="KP4HcIeqUTJPvJBDZ5d6j4Gyp54htV13";
     private static final Uri URL_SEARCH_PLACE = Uri
             .parse("https://maps.googleapis.com/maps/api/place/nearbysearch/json")
+            .buildUpon()
+            .appendQueryParameter("key", GOOGLE_SERVER_KEY)
+            .build();
+    private static final Uri URL_DETAIL_PLACE = Uri
+            .parse("https://maps.googleapis.com/maps/api/place/details/json")
             .buildUpon()
             .appendQueryParameter("key", GOOGLE_SERVER_KEY)
             .build();
@@ -36,6 +41,11 @@ public class NetworkHelper {
                 .appendQueryParameter("rankby", "distance")
                 .appendQueryParameter("types", type)
                 .appendQueryParameter("location", stringLocation)
+                .toString();
+    }
+    public static String getDetailPlace(String placeId) {
+        return URL_DETAIL_PLACE.buildUpon()
+                .appendQueryParameter("placeid",placeId)
                 .toString();
     }
 }

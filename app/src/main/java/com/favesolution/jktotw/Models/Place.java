@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Daniel on 11/3/2015 for JktOtw project.
@@ -17,6 +18,42 @@ public class Place {
     private double mLatitude;
     private double mLongitude;
     private double mDistance;
+    private String mAddress;
+    private float mRating;
+    private String mPhoneNumber;
+    private List<String> mTypes;
+    public List<String> getTypes() {
+        return mTypes;
+    }
+
+    public void setTypes(List<String> types) {
+        mTypes = types;
+    }
+
+    public String getAddress() {
+        return mAddress;
+    }
+
+    public void setAddress(String address) {
+        mAddress = address;
+    }
+
+    public String getPhoneNumber() {
+        return mPhoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        mPhoneNumber = phoneNumber;
+    }
+
+    public float getRating() {
+        return mRating;
+    }
+
+    public void setRating(float rating) {
+        mRating = rating;
+    }
+
 
     public double getDistance() {
         return mDistance;
@@ -69,6 +106,33 @@ public class Place {
             locationPlace.setLatitude(place.mLatitude);
             locationPlace.setLongitude(place.mLongitude);
             place.mDistance = userLocation.distanceTo(locationPlace);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return place;
+    }
+    public static Place fromJsonDetail(JSONObject jsonObject) {
+        Place place = new Place();
+        try {
+            place.setAddress(jsonObject.getString("formatted_address"));
+            if(jsonObject.has("rating"))
+                place.setRating((float) jsonObject.getDouble("rating"));
+            else
+                place.setRating(0f);
+            JSONObject location = jsonObject.getJSONObject("geometry")
+                    .getJSONObject("location");
+            place.setLatitude(location.getDouble("lat"));
+            place.setLongitude(location.getDouble("lng"));
+            if(jsonObject.has("international_phone_number"))
+                place.setPhoneNumber(jsonObject.getString("international_phone_number"));
+            place.setName(jsonObject.getString("name"));
+            JSONArray types = jsonObject.getJSONArray("types");
+            List<String> listType = new ArrayList<>();
+            for (int i = 0; i < types.length(); i++) {
+                listType.add(types.getString(i));
+            }
+            place.setTypes(listType);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
