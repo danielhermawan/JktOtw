@@ -2,17 +2,20 @@ package com.favesolution.jktotw.Models;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Daniel on 11/3/2015 for JktOtw project.
  */
-public class Place {
+public class Place implements Serializable{
     private String mName;
     private String mId;
     private double mLatitude;
@@ -22,6 +25,9 @@ public class Place {
     private float mRating;
     private String mPhoneNumber;
     private List<String> mTypes;
+    public LatLng getLatLng() {
+        return new LatLng(mLatitude,mLongitude);
+    }
     public List<String> getTypes() {
         return mTypes;
     }

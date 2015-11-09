@@ -18,5 +18,22 @@
         <item>hospital</item>
         <item>indosat</item>
     </array>
-
+    <array name="category_icon_marker">
+        <item>@drawable/bitmap_marker_restaurant</item>
+        <item>@drawable/bitmap_marker_entertaiment</item>
+        <item>@drawable/bitmap_marker_atm</item>
+        <item>@drawable/bitmap_marker_lodging</item>
+        <item>@drawable/bitmap_marker_supermarket</item>
+        <item>@drawable/bitmap_marker_hospital</item>
+        <item>@drawable/bitmap_marker_wifi</item>
+    </array>
+    <array name="category_icon_menu">
+        <item>@drawable/ic_local_dining_white_24dp</item>
+        <item>@drawable/ic_mood_white_24dp</item>
+        <item>@drawable/ic_local_atm_white_24dp</item>
+        <item>@drawable/ic_hotel_white_24dp</item>
+        <item>@drawable/ic_local_offer_white_24dp</item>
+        <item>@drawable/ic_local_hospital_white_24dp</item>
+        <item>@drawable/ic_wifi_white_24dp</item>
+    </array>
 </resources>

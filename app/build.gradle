@@ -42,4 +42,5 @@ dependencies {
     provided 'com.github.frankiesardo:icepick-processor:2.3.6'
     compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
     compile 'de.hdodenhof:circleimageview:2.0.0'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
 }

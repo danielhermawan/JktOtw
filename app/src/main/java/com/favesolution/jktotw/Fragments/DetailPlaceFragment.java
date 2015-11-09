@@ -26,16 +26,17 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.favesolution.jktotw.Activities.DirectionActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
 import com.favesolution.jktotw.Dialogs.DialogShare;
 import com.favesolution.jktotw.Helpers.ImageHelper;
+import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.NetworkUtils.CustomJsonRequest;
-import com.favesolution.jktotw.NetworkUtils.UrlEndpoint;
 import com.favesolution.jktotw.NetworkUtils.PhotoTask;
 import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
-import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.NetworkUtils.UrlEndpoint;
 import com.favesolution.jktotw.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
@@ -48,11 +49,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -94,6 +93,7 @@ public class DetailPlaceFragment extends Fragment
     @Bind(R.id.progressBar) ProgressBar mProgressBar;
     @Bind(R.id.button_call) Button mButtonCall;
     @Bind(R.id.button_share) Button mButtonShare;
+    @Bind(R.id.button_direction) Button mButtonDirection;
     @Bind(R.id.swipe_container) ScrollView mSwipeContainer;
     public static DetailPlaceFragment newInstance(String place_id,String placeName) {
         Bundle args = new Bundle();
@@ -164,6 +164,12 @@ public class DetailPlaceFragment extends Fragment
                 DialogShare dialog = DialogShare
                         .newInstance(getString(R.string.share_place,mPlace.getName()),uriImage);
                 dialog.show(fm, DIALOG_CONFIMATION);
+            }
+        });
+        mButtonDirection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(DirectionActivity.newInstance(getActivity(),mPlace));
             }
         });
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));

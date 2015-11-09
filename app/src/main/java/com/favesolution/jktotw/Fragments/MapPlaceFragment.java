@@ -2,18 +2,16 @@ package com.favesolution.jktotw.Fragments;
 
 import android.content.res.TypedArray;
 import android.location.Location;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.favesolution.jktotw.Activities.DetailPlaceActivity;
 import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.NetworkUtils.CustomJsonRequest;
 import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
@@ -23,9 +21,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,10 +45,13 @@ import java.util.List;
 public class MapPlaceFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks {
     private static final String ARG_POSITION = "arg_position";
     private List<Place> mPlaces;
+    private List<Marker> mMarkers = new ArrayList<>();
     private String mCategoryFilter;
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
     private int mPosition;
+    private Marker activeMarker;
+    private int activeMarkerPosition;
     private GoogleMap mMap;
     public static MapPlaceFragment newInstance(int position) {
         Bundle args = new Bundle();
@@ -63,7 +71,6 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                 .obtainTypedArray(R.array.categories)
                 .getString(mPosition) + " " + getString(R.string.near_you));
         TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
-        refreshPlace();
         mCategoryFilter = categoryFilterList.getString(mPosition);
         mClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(LocationServices.API)
@@ -73,11 +80,36 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mMap = googleMap;
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        if (marker.equals(activeMarker)) {
+                            Place place = mPlaces.get(activeMarkerPosition);
+                            startActivity(DetailPlaceActivity.newIntent(getActivity(),place.getId(),place.getName()));
+                        }
+                        for (int i = 0; i < mMarkers.size(); i++) {
+                            if (marker.equals(mMarkers.get(i))) {
+                                activeMarker = marker;
+                                activeMarkerPosition = i;
+                                break;
+                            }
+                        }
+                        return false;
+                    }
+                });
                 updateMap();
             }
         });
     }
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onStart() {
         super.onStart();
@@ -100,7 +132,12 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                 .requestLocationUpdates(mClient, request, new LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
-                        mCurrentLocation = location;
+                        if (mCurrentLocation == null) {
+                            mCurrentLocation = location;
+                            refreshPlace();
+                        } else {
+                            mCurrentLocation = location;
+                        }
                         updateMap();
                     }
                 });
@@ -111,9 +148,23 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
 
     }
     private void updateMap() {
-        if(mMap == null && mCurrentLocation == null && mPlaces ==null)
+        if(mMap == null || mCurrentLocation == null)
             return;
-
+        LatLng latLngUser = new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(latLngUser).title(getString(R.string.you)));
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngUser, 15);
+        mMap.animateCamera(cameraUpdate);
+        if(mPlaces==null)
+            return;
+        TypedArray categoryIcon = getResources().obtainTypedArray(R.array.category_icon_marker);
+        BitmapDescriptor customMarker = BitmapDescriptorFactory
+        .fromResource(categoryIcon.getResourceId(mPosition,0));
+        for (Place place:mPlaces) {
+            MarkerOptions marker = new MarkerOptions().position(place.getLatLng())
+                    .title(place.getName()).icon(customMarker).snippet(place.getAddress());
+            Marker m = mMap.addMarker(marker);
+            mMarkers.add(m);
+        }
     }
     private void refreshPlace() {
         RequestQueueSingleton.getInstance(getActivity())
@@ -142,4 +193,5 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
         RequestQueueSingleton.getInstance(getActivity())
                 .addToRequestQueue(placeRequest);
     }
+
 }

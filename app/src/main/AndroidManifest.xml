@@ -66,6 +66,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.favesolution.jktotw.Activities.ListPlacesActivity" />
         </activity>
+        <activity
+            android:name=".Activities.DirectionActivity"
+            android:label="@string/title_activity_direction"
+            android:parentActivityName=".Activities.DetailPlaceActivity"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.DetailPlaceActivity" />
+        </activity>
     </application>
 
 </manifest>
