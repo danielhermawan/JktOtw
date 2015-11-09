@@ -70,7 +70,6 @@ public class DetailPlaceFragment extends Fragment
     private String mplaceId;
     private String mPlaceName;
     private Place mPlace;
-    private String mPhone;
     private GoogleMap mMap;
     private static final String DIALOG_CONFIMATION = "dialog_confirmation";
     private static final String DIALOG_MESSAGE = "dialog_message";
@@ -214,7 +213,6 @@ public class DetailPlaceFragment extends Fragment
                 .addToRequestQueue(placeDetailRequest);
         return v;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -331,7 +329,6 @@ public class DetailPlaceFragment extends Fragment
             mTextRating.setText(getString(R.string.no_rating));
             mRatingBar.setVisibility(View.GONE);
         }
-        mPhone = mPlace.getPhoneNumber();
         String type =  mPlace.getTypes().get(0);
         mTextSearchNearby.setText(Html.fromHtml(getString(R.string.search_place_nearby,
                 (type.substring(0,1).toUpperCase() + type.substring(1)).replace("_"," "))));

@@ -35,7 +35,7 @@ public class DialogMessage extends DialogFragment{
         mButtonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendResult(Activity.RESULT_OK,0);
+                dismiss();sendResult(Activity.RESULT_OK,0);
             }
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
@@ -54,7 +54,7 @@ public class DialogMessage extends DialogFragment{
             return;
         Intent i = new Intent();
         i.putExtra(EXTRA_CONFIRM, confirm);
+
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, i);
-        dismiss();
     }
 }

@@ -7,14 +7,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
 import com.favesolution.jktotw.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by Daniel on 11/9/2015 for JktOtw project.
@@ -27,7 +32,7 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
     private Location mCurrentLocation;
     public static DirectionFragment newInstance(Place place) {
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PLACE,place);
+        args.putParcelable(ARG_PLACE, place);
         DirectionFragment fragment = new DirectionFragment();
         fragment.setArguments(args);
         return fragment;
@@ -36,7 +41,7 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mPlace = (Place) getArguments().getSerializable(ARG_PLACE);
+        mPlace = getArguments().getParcelable(ARG_PLACE);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(getString(R.string.direction_actiobar,mPlace.getName()));
         mClient = new GoogleApiClient.Builder(getActivity())
@@ -61,6 +66,18 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
         return super.onOptionsItemSelected(item);
     }
     @Override
+    public void onStart() {
+        super.onStart();
+        mClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mClient.disconnect();
+        RequestQueueSingleton.getInstance(getActivity()).getRequestQueue().cancelAll(this);
+    }
+    @Override
     public void onConnected(Bundle bundle) {
         LocationRequest request = LocationRequest.create();
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -81,6 +98,11 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
 
     }
     private void updateMap() {
-
+        if(mMap == null || mCurrentLocation == null)
+            return;
+        LatLng latLngUser = new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(latLngUser).title(getString(R.string.you)));
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngUser, 17);
+        mMap.animateCamera(cameraUpdate);
     }
 }

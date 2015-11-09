@@ -1,6 +1,7 @@
 package com.favesolution.jktotw.Models;
 
 import android.location.Location;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -8,14 +9,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Daniel on 11/3/2015 for JktOtw project.
  */
-public class Place implements Serializable{
+public class Place implements Parcelable{
     private String mName;
     private String mId;
     private double mLatitude;
@@ -25,6 +25,50 @@ public class Place implements Serializable{
     private float mRating;
     private String mPhoneNumber;
     private List<String> mTypes;
+
+    public Place() {
+    }
+
+    protected Place(android.os.Parcel in) {
+        mName = in.readString();
+        mId = in.readString();
+        mLatitude = in.readDouble();
+        mLongitude = in.readDouble();
+        mDistance = in.readDouble();
+        mAddress = in.readString();
+        mRating = in.readFloat();
+        mPhoneNumber = in.readString();
+        mTypes = in.createStringArrayList();
+    }
+
+    public static final Creator<Place> CREATOR = new Creator<Place>() {
+        @Override
+        public Place createFromParcel(android.os.Parcel in) {
+            return new Place(in);
+        }
+
+        @Override
+        public Place[] newArray(int size) {
+            return new Place[size];
+        }
+    };
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeString(mName);
+        dest.writeString(mId);
+        dest.writeDouble(mLatitude);
+        dest.writeDouble(mLongitude);
+        dest.writeDouble(mDistance);
+        dest.writeString(mAddress);
+        dest.writeFloat(mRating);
+        dest.writeString(mPhoneNumber);
+        dest.writeStringList(mTypes);
+    }
     public LatLng getLatLng() {
         return new LatLng(mLatitude,mLongitude);
     }
@@ -162,4 +206,6 @@ public class Place implements Serializable{
         }
         return places;
     }
+
+
 }

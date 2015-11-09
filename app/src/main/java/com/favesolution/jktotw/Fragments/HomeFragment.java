@@ -1,16 +1,23 @@
 package com.favesolution.jktotw.Fragments;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.favesolution.jktotw.Activities.ListPlacesActivity;
+import com.favesolution.jktotw.Activities.SearchActivity;
 import com.favesolution.jktotw.Helpers.DividerItemDecoration;
 import com.favesolution.jktotw.R;
 
@@ -27,6 +34,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -43,6 +52,19 @@ public class HomeFragment extends Fragment {
         mRecyclerView.addItemDecoration(itemDecoration);
         return v;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_search, menu);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.item_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getActivity(), SearchActivity.class)));
+        searchView.setIconifiedByDefault(true);
+
+    }
+
+
     private class CategoryHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         private TextView mTextView;

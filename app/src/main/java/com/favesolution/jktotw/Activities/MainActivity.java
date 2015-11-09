@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
         UIHelper.showOverflowMenu(this);
         //todo: change menu to display programtilly
     }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

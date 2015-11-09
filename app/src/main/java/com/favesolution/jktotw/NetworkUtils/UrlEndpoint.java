@@ -1,7 +1,12 @@
 package com.favesolution.jktotw.NetworkUtils;
 
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.location.Location;
 import android.net.Uri;
+import android.util.Log;
+
+import com.favesolution.jktotw.R;
 
 public class UrlEndpoint {
     private static final String BASE_WEBSERVICE_URL = "http://favesolution.com/jktotw/";
@@ -46,6 +51,24 @@ public class UrlEndpoint {
     public static String getDetailPlace(String placeId) {
         return URL_DETAIL_PLACE.buildUpon()
                 .appendQueryParameter("placeid",placeId)
+                .toString();
+    }
+    public static String searchNearbyPlaceByKeyword(Context context,Location location,String keyword) {
+        String filter="";
+        TypedArray filterArray = context.getResources().obtainTypedArray(R.array.category_filter);
+        for (int i = 0; i < filterArray.length()-1; i++) {
+            if(i!=0)
+                filter+="|";
+            filter+=filterArray.getString(i);
+        }
+
+        String stringLocation = location.getLatitude() + "," + location.getLongitude();
+        Log.d("debug",filter);
+        return URL_SEARCH_PLACE.buildUpon()
+                .appendQueryParameter("rankby", "distance")
+                .appendQueryParameter("location", stringLocation)
+                .appendQueryParameter("keyword",keyword)
+                .appendQueryParameter("types", filter)
                 .toString();
     }
 }

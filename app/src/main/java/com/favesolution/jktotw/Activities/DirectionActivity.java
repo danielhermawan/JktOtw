@@ -27,7 +27,7 @@ public class DirectionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Place place = (Place) getIntent().getSerializableExtra(EXTRA_PLACE);
+        Place place = getIntent().getParcelableExtra(EXTRA_PLACE);
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.content_frame);
         if(fragment == null){
@@ -54,7 +54,7 @@ public class DirectionActivity extends AppCompatActivity {
     }
     public static Intent newInstance(Context context,Place place) {
         Intent i = new Intent(context,DirectionActivity.class);
-        i.putExtra(EXTRA_PLACE,place);
+        i.putExtra(EXTRA_PLACE, place);
         return i;
     }
 }
