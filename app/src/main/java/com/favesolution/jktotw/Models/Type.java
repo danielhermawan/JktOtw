@@ -1,12 +1,19 @@
 package com.favesolution.jktotw.Models;
 
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.favesolution.jktotw.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Daniel on 11/9/2015 for JktOtw project.
  */
-public class Category implements Parcelable {
+public class Type implements Parcelable {
     private String categoryName;
     private String categoryFilter;
     private int categoryIconMarker;
@@ -56,24 +63,39 @@ public class Category implements Parcelable {
         dest.writeInt(this.categoryIconMarker);
         dest.writeInt(this.categoryIconMenu);
     }
-
-    public Category() {
+    public static List<Type> getCategory(Context context) {
+        TypedArray categories = context.getResources().obtainTypedArray(R.array.categories);
+        TypedArray categoryFilters = context.getResources().obtainTypedArray(R.array.category_filter);
+        TypedArray categoryMarkers = context.getResources().obtainTypedArray(R.array.category_icon_marker);
+        TypedArray categoryMenus = context.getResources().obtainTypedArray(R.array.category_icon_menu);
+        List<Type> types = new ArrayList<>();
+        for (int i = 0; i < categories.length(); i++) {
+            Type type = new Type();
+            type.setCategoryName(categories.getString(i));
+            type.setCategoryFilter(categoryFilters.getString(i));
+            type.setCategoryIconMarker(categoryMarkers.getResourceId(i,0));
+            type.setCategoryIconMenu(categoryMenus.getResourceId(i,0));
+            types.add(type);
+        }
+        return types;
+    }
+    public Type() {
     }
 
-    protected Category(Parcel in) {
+    protected Type(Parcel in) {
         this.categoryName = in.readString();
         this.categoryFilter = in.readString();
         this.categoryIconMarker = in.readInt();
         this.categoryIconMenu = in.readInt();
     }
 
-    public static final Parcelable.Creator<Category> CREATOR = new Parcelable.Creator<Category>() {
-        public Category createFromParcel(Parcel source) {
-            return new Category(source);
+    public static final Parcelable.Creator<Type> CREATOR = new Parcelable.Creator<Type>() {
+        public Type createFromParcel(Parcel source) {
+            return new Type(source);
         }
 
-        public Category[] newArray(int size) {
-            return new Category[size];
+        public Type[] newArray(int size) {
+            return new Type[size];
         }
     };
 }

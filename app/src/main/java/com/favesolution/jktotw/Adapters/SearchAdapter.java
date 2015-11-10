@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.favesolution.jktotw.Activities.DetailPlaceActivity;
 import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.List;
 
@@ -22,9 +25,10 @@ import butterknife.ButterKnife;
  */
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHolder>{
     private List<Place> mPlaces;
-
-    public SearchAdapter(List<Place> places) {
+    private GoogleApiClient mClient;
+    public SearchAdapter(List<Place> places,GoogleApiClient client) {
         mPlaces = places;
+        mClient = client;
     }
 
     @Override
@@ -37,7 +41,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHold
     @Override
     public void onBindViewHolder(SearchHolder holder, int position) {
         Place place = mPlaces.get(position);
-        holder.bindView(place);
+        //Log.d("debug","Position = "+position+" "+place.getAddress());
+        holder.bindView(place,mClient);
     }
 
     @Override
@@ -52,6 +57,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHold
         @Bind(R.id.text_address_place) TextView mTextAddress;
         private Place mPlace;
         private Context mContext;
+        private GoogleApiClient mClient;
         public SearchHolder(View itemView,Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -62,10 +68,16 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHold
         public void onClick(View v) {
             mContext.startActivity(DetailPlaceActivity.newIntent(mContext,mPlace.getId(),mPlace.getName()));
         }
-        public void bindView(Place place) {
+        public void bindView(Place place,GoogleApiClient client) {
             mPlace = place;
+            mClient = client;
             mTextName.setText(place.getName());
-           // mTextAddress.setText(place.getAddress());
+            mTextAddress.setText(place.getAddress());
+            String url = UrlEndpoint.getPhotoUrl(mPlace.getPhotoRef(), 70, 70);
+            Glide.with(mContext)
+                    .load(url)
+                    .error(R.drawable.bitmap_placeholder)
+                    .into(mImageView);
         }
     }
 }

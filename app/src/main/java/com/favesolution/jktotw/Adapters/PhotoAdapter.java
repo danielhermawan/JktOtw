@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.favesolution.jktotw.NetworkUtils.PhotoTask;
+import com.favesolution.jktotw.Networks.PhotoTask;
 import com.favesolution.jktotw.R;
 
 import java.util.List;

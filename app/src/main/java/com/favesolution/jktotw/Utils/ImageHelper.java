@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.Utils;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;

@@ -1,6 +1,7 @@
 package com.favesolution.jktotw.Models;
 
 import android.location.Location;
+import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -25,53 +26,31 @@ public class Place implements Parcelable{
     private float mRating;
     private String mPhoneNumber;
     private List<String> mTypes;
-
+    private String mPhotoRef;
+    private Type mType;
     public Place() {
     }
 
-    protected Place(android.os.Parcel in) {
-        mName = in.readString();
-        mId = in.readString();
-        mLatitude = in.readDouble();
-        mLongitude = in.readDouble();
-        mDistance = in.readDouble();
-        mAddress = in.readString();
-        mRating = in.readFloat();
-        mPhoneNumber = in.readString();
-        mTypes = in.createStringArrayList();
-    }
-
-    public static final Creator<Place> CREATOR = new Creator<Place>() {
-        @Override
-        public Place createFromParcel(android.os.Parcel in) {
-            return new Place(in);
-        }
-
-        @Override
-        public Place[] newArray(int size) {
-            return new Place[size];
-        }
-    };
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(android.os.Parcel dest, int flags) {
-        dest.writeString(mName);
-        dest.writeString(mId);
-        dest.writeDouble(mLatitude);
-        dest.writeDouble(mLongitude);
-        dest.writeDouble(mDistance);
-        dest.writeString(mAddress);
-        dest.writeFloat(mRating);
-        dest.writeString(mPhoneNumber);
-        dest.writeStringList(mTypes);
-    }
     public LatLng getLatLng() {
         return new LatLng(mLatitude,mLongitude);
     }
+
+    public Type getType() {
+        return mType;
+    }
+
+    public void setType(Type type) {
+        mType = type;
+    }
+
+    public String getPhotoRef() {
+        return mPhotoRef;
+    }
+
+    public void setPhotoRef(String photoRef) {
+        mPhotoRef = photoRef;
+    }
+
     public List<String> getTypes() {
         return mTypes;
     }
@@ -156,6 +135,11 @@ public class Place implements Parcelable{
             locationPlace.setLatitude(place.mLatitude);
             locationPlace.setLongitude(place.mLongitude);
             place.mDistance = userLocation.distanceTo(locationPlace);
+            if (jsonObject.has("photos")) {
+                JSONArray photos = jsonObject.getJSONArray("photos");
+                JSONObject photo = photos.getJSONObject(0);
+                place.mPhotoRef = photo.getString("photo_reference");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -208,4 +192,47 @@ public class Place implements Parcelable{
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.mName);
+        dest.writeString(this.mId);
+        dest.writeDouble(this.mLatitude);
+        dest.writeDouble(this.mLongitude);
+        dest.writeDouble(this.mDistance);
+        dest.writeString(this.mAddress);
+        dest.writeFloat(this.mRating);
+        dest.writeString(this.mPhoneNumber);
+        dest.writeStringList(this.mTypes);
+        dest.writeString(this.mPhotoRef);
+        dest.writeParcelable(this.mType, 0);
+    }
+
+    protected Place(Parcel in) {
+        this.mName = in.readString();
+        this.mId = in.readString();
+        this.mLatitude = in.readDouble();
+        this.mLongitude = in.readDouble();
+        this.mDistance = in.readDouble();
+        this.mAddress = in.readString();
+        this.mRating = in.readFloat();
+        this.mPhoneNumber = in.readString();
+        this.mTypes = in.createStringArrayList();
+        this.mPhotoRef = in.readString();
+        this.mType = in.readParcelable(Type.class.getClassLoader());
+    }
+
+    public static final Creator<Place> CREATOR = new Creator<Place>() {
+        public Place createFromParcel(Parcel source) {
+            return new Place(source);
+        }
+
+        public Place[] newArray(int size) {
+            return new Place[size];
+        }
+    };
 }

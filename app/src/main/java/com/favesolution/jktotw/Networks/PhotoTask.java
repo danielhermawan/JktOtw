@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.NetworkUtils;
+package com.favesolution.jktotw.Networks;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;

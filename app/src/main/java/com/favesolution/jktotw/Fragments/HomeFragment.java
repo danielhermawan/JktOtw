@@ -3,7 +3,6 @@ package com.favesolution.jktotw.Fragments;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,17 +15,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Activities.SearchActivity;
-import com.favesolution.jktotw.Helpers.DividerItemDecoration;
+import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.DividerItemDecoration;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class HomeFragment extends Fragment {
     @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
-    private TypedArray mCategoryList;
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         return fragment;
@@ -43,9 +43,9 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v =inflater.inflate(R.layout.fragment_home,container,false);
         ButterKnife.bind(this,v);
-        mCategoryList = getResources().obtainTypedArray(R.array.categories);
+        List<Type> types = Type.getCategory(getActivity());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(new CategoryAdapter(mCategoryList));
+        mRecyclerView.setAdapter(new CategoryAdapter(types));
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST);
@@ -68,26 +68,26 @@ public class HomeFragment extends Fragment {
     private class CategoryHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         private TextView mTextView;
-        private int mPosition;
+        private Type mType;
         public CategoryHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView.findViewById(R.id.category_text);
             itemView.setOnClickListener(this);
         }
-        public void bindCategoryItem(String category,int position) {
-            mPosition = position;
-            mTextView.setText(category);
+        public void bindCategoryItem(Type type) {
+            mType = type;
+            mTextView.setText(type.getCategoryName());
         }
         @Override
         public void onClick(View v) {
-            getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),mPosition));
+            //getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),mPosition));
         }
     }
 
     private class CategoryAdapter extends RecyclerView.Adapter<CategoryHolder> {
-        private TypedArray mCategoryItems;
-        public CategoryAdapter(TypedArray categoryItems) {
-            mCategoryItems = categoryItems;
+        private List<Type> mTypes;
+        public CategoryAdapter(List<Type> types) {
+            mTypes = types;
         }
         @Override
         public CategoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -98,13 +98,13 @@ public class HomeFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(CategoryHolder holder, int position) {
-            String category = mCategoryItems.getString(position);
-            holder.bindCategoryItem(category,position);
+            Type type = mTypes.get(position);
+            holder.bindCategoryItem(type);
         }
 
         @Override
         public int getItemCount() {
-            return mCategoryItems.length();
+            return mTypes.size();
         }
     }
 

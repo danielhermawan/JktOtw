@@ -17,9 +17,9 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.favesolution.jktotw.Fragments.HomeFragment;
-import com.favesolution.jktotw.Helpers.SharedPreference;
-import com.favesolution.jktotw.Helpers.UIHelper;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.SharedPreference;
+import com.favesolution.jktotw.Utils.UIHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

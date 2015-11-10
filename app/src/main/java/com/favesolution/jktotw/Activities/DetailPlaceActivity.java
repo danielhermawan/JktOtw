@@ -9,8 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.favesolution.jktotw.Fragments.DetailPlaceFragment;
-import com.favesolution.jktotw.Helpers.UIHelper;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.UIHelper;
 
 public class DetailPlaceActivity extends AppCompatActivity {
     private static final String EXTRA_PLACE_ID="place_id";

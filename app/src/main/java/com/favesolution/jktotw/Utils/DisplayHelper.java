@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.Utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

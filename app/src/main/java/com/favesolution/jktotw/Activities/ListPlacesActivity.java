@@ -11,8 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.favesolution.jktotw.Fragments.ListPlacesFragment;
-import com.favesolution.jktotw.Helpers.UIHelper;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.UIHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 

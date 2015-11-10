@@ -2,6 +2,7 @@ package com.favesolution.jktotw.Fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,17 +28,18 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DirectionActivity;
+import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
 import com.favesolution.jktotw.Dialogs.DialogShare;
-import com.favesolution.jktotw.Helpers.ImageHelper;
 import com.favesolution.jktotw.Models.Place;
-import com.favesolution.jktotw.NetworkUtils.CustomJsonRequest;
-import com.favesolution.jktotw.NetworkUtils.PhotoTask;
-import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
-import com.favesolution.jktotw.NetworkUtils.UrlEndpoint;
+import com.favesolution.jktotw.Networks.CustomJsonRequest;
+import com.favesolution.jktotw.Networks.PhotoTask;
+import com.favesolution.jktotw.Networks.RequestQueueSingleton;
+import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.ImageHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
@@ -329,9 +331,23 @@ public class DetailPlaceFragment extends Fragment
             mTextRating.setText(getString(R.string.no_rating));
             mRatingBar.setVisibility(View.GONE);
         }
-        String type =  mPlace.getTypes().get(0);
+        final String type =  mPlace.getTypes().get(0);
         mTextSearchNearby.setText(Html.fromHtml(getString(R.string.search_place_nearby,
                 (type.substring(0,1).toUpperCase() + type.substring(1)).replace("_"," "))));
+        mTextSearchNearby.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
+                int position = 0;
+                for (int i = 0; i < categoryFilterList.length(); i++) {
+                    if (categoryFilterList.getString(i).contains(type)) {
+                        position = i;
+                        break;
+                    }
+                }
+                getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),position).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
         if (mMap!=null) {
             updateMap();
         }

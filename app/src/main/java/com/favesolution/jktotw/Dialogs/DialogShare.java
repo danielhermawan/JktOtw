@@ -14,8 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.favesolution.jktotw.Adapters.ShareAdapter;
-import com.favesolution.jktotw.Helpers.DividerItemDecoration;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.DividerItemDecoration;
 
 import java.util.List;
 

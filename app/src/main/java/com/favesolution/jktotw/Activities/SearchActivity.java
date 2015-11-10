@@ -3,9 +3,11 @@ package com.favesolution.jktotw.Activities;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.os.ResultReceiver;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,13 +22,14 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Adapters.SearchAdapter;
-import com.favesolution.jktotw.Helpers.DividerItemDecoration;
-import com.favesolution.jktotw.Helpers.UIHelper;
 import com.favesolution.jktotw.Models.Place;
-import com.favesolution.jktotw.NetworkUtils.CustomJsonRequest;
-import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
-import com.favesolution.jktotw.NetworkUtils.UrlEndpoint;
+import com.favesolution.jktotw.Networks.CustomJsonRequest;
+import com.favesolution.jktotw.Networks.RequestQueueSingleton;
+import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Services.FetchAddressIntentService;
+import com.favesolution.jktotw.Utils.DividerItemDecoration;
+import com.favesolution.jktotw.Utils.UIHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -37,19 +40,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class SearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
     @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
-    private List<Place> mPlaces = new ArrayList<>();
+    @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
+    private ArrayList<Place> mPlaces = new ArrayList<>();
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
     private String mQuery;
-    private Geocoder mGeocoder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,14 +67,23 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         mRecyclerView.addItemDecoration(itemDecoration);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            mQuery = query;
+            mQuery = intent.getStringExtra(SearchManager.QUERY);
         }
-        mGeocoder = new Geocoder(this, Locale.getDefault());
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_light,
+                R.color.colorAccent,
+                android.R.color.holo_red_light);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                doSearch();
+            }
+        });
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .build();
+
     }
     @Override
     public void onStart() {
@@ -84,8 +94,8 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            mQuery = query;
+            mQuery = intent.getStringExtra(SearchManager.QUERY);
+            mSwipeRefreshLayout.setRefreshing(true);
             doSearch();
         }
     }
@@ -149,17 +159,28 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                 try {
                     JSONArray result = response.getJSONArray("results");
                     mPlaces = Place.fromJson(result, mCurrentLocation);
-
+                    SearchActivity.this.startService(FetchAddressIntentService.newIntent(
+                            SearchActivity.this,
+                            mPlaces,
+                            new ResultReceiver(new Handler()){
+                                @Override
+                                protected void onReceiveResult(int resultCode, Bundle resultData) {
+                                    mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
+                                    setupAdapter();
+                                    mSwipeRefreshLayout.setRefreshing(false);
+                                }
+                            }
+                    ));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                setupAdapter();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(SearchActivity.this, "Network error", Toast.LENGTH_SHORT).show();
                 Log.e("error", error.getMessage());
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
         searchRequest.setTag(this);
@@ -167,7 +188,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                 .addToRequestQueue(searchRequest);
     }
     private void setupAdapter() {
-        mRecyclerView.setAdapter(new SearchAdapter(mPlaces));
+        mRecyclerView.setAdapter(new SearchAdapter(mPlaces,mClient));
     }
 
 

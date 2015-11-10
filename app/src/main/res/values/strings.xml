@@ -21,7 +21,7 @@
 
     <string name="app_name">JktOtw</string>
     <string name="discover">Discover</string>
-    <string name="navigation_item_home">HOM</string>
+    <string name="navigation_item_home">HOME</string>
     <string name="navigation_item_login">LOGIN</string>
     <string name="navigation_item_search">SEARCH</string>
     <string name="navigation_item_map">MAPS</string>
@@ -80,4 +80,6 @@
     <string name="direction_actiobar">Direction %s</string>
     <string name="search_hint">Search Place</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="no_location">No location provided</string>
+    <string name="address_not_found">Address not found</string>
 </resources>

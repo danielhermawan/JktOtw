@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.NetworkUtils;
+package com.favesolution.jktotw.Networks;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,6 +6,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
+import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.R;
 
 public class UrlEndpoint {
@@ -19,6 +20,16 @@ public class UrlEndpoint {
             .build();
     private static final Uri URL_DETAIL_PLACE = Uri
             .parse("https://maps.googleapis.com/maps/api/place/details/json")
+            .buildUpon()
+            .appendQueryParameter("key", GOOGLE_SERVER_KEY)
+            .build();
+    private static final Uri URL_PHOTO_PLACE = Uri
+            .parse("https://maps.googleapis.com/maps/api/place/photo")
+            .buildUpon()
+            .appendQueryParameter("key", GOOGLE_SERVER_KEY)
+            .build();
+    private static final Uri URL_PLACE_DIRECTION = Uri
+            .parse("https://maps.googleapis.com/maps/api/directions/json")
             .buildUpon()
             .appendQueryParameter("key", GOOGLE_SERVER_KEY)
             .build();
@@ -67,8 +78,21 @@ public class UrlEndpoint {
         return URL_SEARCH_PLACE.buildUpon()
                 .appendQueryParameter("rankby", "distance")
                 .appendQueryParameter("location", stringLocation)
-                .appendQueryParameter("keyword",keyword)
+                .appendQueryParameter("keyword", keyword)
                 .appendQueryParameter("types", filter)
+                .toString();
+    }
+    public static String getPhotoUrl(String reference,int maxWidth,int maxHeight) {
+        return URL_PHOTO_PLACE.buildUpon()
+                .appendQueryParameter("photoreference",reference)
+                .appendQueryParameter("maxheight",maxHeight+"")
+                .appendQueryParameter("maxwidth",maxWidth+"")
+                .toString();
+    }
+    public static String getDirectionUrl(Location origin,Place place) {
+        return URL_PLACE_DIRECTION.buildUpon()
+                .appendQueryParameter("origin",origin.getLatitude()+","+origin.getLongitude())
+                .appendQueryParameter("destination",place.getLatitude()+","+place.getLongitude())
                 .toString();
     }
 }

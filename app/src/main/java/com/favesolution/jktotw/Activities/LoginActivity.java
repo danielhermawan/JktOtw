@@ -21,11 +21,11 @@ import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.favesolution.jktotw.NetworkUtils.CustomJsonRequest;
-import com.favesolution.jktotw.NetworkUtils.UrlEndpoint;
-import com.favesolution.jktotw.NetworkUtils.RequestQueueSingleton;
-import com.favesolution.jktotw.Helpers.SharedPreference;
+import com.favesolution.jktotw.Networks.CustomJsonRequest;
+import com.favesolution.jktotw.Networks.RequestQueueSingleton;
+import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.SharedPreference;
 
 import org.json.JSONException;
 import org.json.JSONObject;

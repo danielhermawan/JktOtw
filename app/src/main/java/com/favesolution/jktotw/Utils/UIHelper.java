@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.Utils;
 
 import android.support.v4.app.FragmentActivity;
 import android.view.ViewConfiguration;

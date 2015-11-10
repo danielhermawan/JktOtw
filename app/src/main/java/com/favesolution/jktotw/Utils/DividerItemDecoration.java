@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.Helpers;
+package com.favesolution.jktotw.Utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;

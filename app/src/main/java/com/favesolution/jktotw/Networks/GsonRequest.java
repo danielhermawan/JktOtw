@@ -1,4 +1,4 @@
-package com.favesolution.jktotw.NetworkUtils;
+package com.favesolution.jktotw.Networks;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
