@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.os.ResultReceiver;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,7 +45,6 @@ import butterknife.ButterKnife;
 
 public class SearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
     @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
-    @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
     private ArrayList<Place> mPlaces = new ArrayList<>();
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
@@ -69,16 +67,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
         }
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_light,
-                R.color.colorAccent,
-                android.R.color.holo_red_light);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                doSearch();
-            }
-        });
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -95,7 +83,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         super.onNewIntent(intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
-            mSwipeRefreshLayout.setRefreshing(true);
             doSearch();
         }
     }
@@ -167,7 +154,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                                 protected void onReceiveResult(int resultCode, Bundle resultData) {
                                     mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
                                     setupAdapter();
-                                    mSwipeRefreshLayout.setRefreshing(false);
                                 }
                             }
                     ));
@@ -180,7 +166,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(SearchActivity.this, "Network error", Toast.LENGTH_SHORT).show();
                 Log.e("error", error.getMessage());
-                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
         searchRequest.setTag(this);

@@ -2,7 +2,6 @@ package com.favesolution.jktotw.Fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,11 +27,13 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DirectionActivity;
+import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
 import com.favesolution.jktotw.Dialogs.DialogShare;
 import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.Networks.CustomJsonRequest;
 import com.favesolution.jktotw.Networks.PhotoTask;
 import com.favesolution.jktotw.Networks.RequestQueueSingleton;
@@ -64,17 +65,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class DetailPlaceFragment extends Fragment
         implements GoogleApiClient.ConnectionCallbacks {
-    private static final String ARGS_PLACE_ID = "place_id";
-    private static final String ARGS_NAME = "place_name";
+    private static final String ARGS_PLACE = "args_place";
     private static final String TAG = "DetailPlaceFragment";
-    private GoogleApiClient mGoogleApiClient;
-    private String mplaceId;
-    private String mPlaceName;
-    private Place mPlace;
-    private GoogleMap mMap;
     private static final String DIALOG_CONFIMATION = "dialog_confirmation";
     private static final String DIALOG_MESSAGE = "dialog_message";
     private static final int REQUEST_DIALOG_CONFIMATION = 1;
+    private GoogleApiClient mGoogleApiClient;
+    private Place mPlace;
+    private GoogleMap mMap;
+    private String mPlaceId;
     @Bind(R.id.map_place) MapView mMapView;
     @Bind(R.id.text_search_nearby) TextView mTextSearchNearby;
     @Bind(R.id.text_name_place) TextView mTextNamePlace;
@@ -95,10 +94,9 @@ public class DetailPlaceFragment extends Fragment
     @Bind(R.id.button_share) Button mButtonShare;
     @Bind(R.id.button_direction) Button mButtonDirection;
     @Bind(R.id.swipe_container) ScrollView mSwipeContainer;
-    public static DetailPlaceFragment newInstance(String place_id,String placeName) {
+    public static DetailPlaceFragment newInstance(Place place) {
         Bundle args = new Bundle();
-        args.putString(ARGS_PLACE_ID,place_id);
-        args.putString(ARGS_NAME,placeName);
+        args.putParcelable(ARGS_PLACE,place);
         DetailPlaceFragment fragment = new DetailPlaceFragment();
         fragment.setArguments(args);
         return fragment;
@@ -108,8 +106,8 @@ public class DetailPlaceFragment extends Fragment
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
-        mplaceId = getArguments().getString(ARGS_PLACE_ID);
-        mPlaceName = getArguments().getString(ARGS_NAME);
+        mPlace = getArguments().getParcelable(ARGS_PLACE);
+        mPlaceId = mPlace.getId();
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(Places.GEO_DATA_API)
                 .addConnectionCallbacks(this)
@@ -120,18 +118,7 @@ public class DetailPlaceFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_detail_place, container, false);
         ButterKnife.bind(this, v);
-        setActionBarTitle(mPlaceName);
-        /*mSwipeContainer.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_light,
-                R.color.colorAccent,
-                android.R.color.holo_red_light);
-        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mSwipeContainer.setRefreshing(false);
-            }
-        });
-        mSwipeContainer.setRefreshing(true);*/
+        setActionBarTitle(mPlace.getName());
         mImagePlace.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.bitmap_placeholder));
         mTextPhoto.setText(getString(R.string.photos_number, 0));
         mTextReviewNumber.setText(getString(R.string.reviews_number, 0));
@@ -185,7 +172,7 @@ public class DetailPlaceFragment extends Fragment
                     updateMap();
             }
         });
-        final String url = UrlEndpoint.getDetailPlace(mplaceId);
+        final String url = UrlEndpoint.getDetailPlace(mPlace.getId());
         Log.d("debug",url);
         CustomJsonRequest placeDetailRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -194,7 +181,7 @@ public class DetailPlaceFragment extends Fragment
                 showProgressBar(false);
                 try {
                     JSONObject result = response.getJSONObject("result");
-                    mPlace = Place.fromJsonDetail(result);
+                    mPlace = Place.fromJsonDetail(result,getActivity());
                     updatePlace();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -263,22 +250,7 @@ public class DetailPlaceFragment extends Fragment
 
     @Override
     public void onConnected(Bundle bundle) {
-        /*Places.GeoDataApi.getPlaceById(mGoogleApiClient, mplaceId)
-                .setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(PlaceBuffer places) {
-                        if (places.getStatus().isSuccess() && places.getCount() > 0) {
-                            mPlace = places.get(0);
-                            updatePlace();
-                        } else {
-                            Log.e(TAG, "Place not found. Status " + places.getStatus().getStatusMessage());
-                        }
-                        places.release();
-                    }
-                });*/
-        new PhotoTask(getResources().getDimension(R.dimen.image_photo_circle_width)
-                ,getResources().getDimension(R.dimen.image_photo_circle_height)
-                ,mGoogleApiClient,4)
+        new PhotoTask(getResources().getDimension(R.dimen.image_photo_circle_width),getResources().getDimension(R.dimen.image_photo_circle_height),mGoogleApiClient,4)
                 .setOnResultCallback(new PhotoTask.FinishLoadingAction() {
                     @Override
                     public void onResult(List<PhotoTask.AttributedPhoto> attributedPhotos) {
@@ -291,7 +263,7 @@ public class DetailPlaceFragment extends Fragment
                         }
                     }
                 })
-        .execute(mplaceId);
+        .execute(mPlaceId);
     }
 
     @Override
@@ -330,21 +302,12 @@ public class DetailPlaceFragment extends Fragment
             mTextRating.setText(getString(R.string.no_rating));
             mRatingBar.setVisibility(View.GONE);
         }
-        final String type =  mPlace.getTypes().get(0);
-        mTextSearchNearby.setText(Html.fromHtml(getString(R.string.search_place_nearby,
-                (type.substring(0,1).toUpperCase() + type.substring(1)).replace("_"," "))));
+        final Type type =  mPlace.getType();
+        mTextSearchNearby.setText(Html.fromHtml(getString(R.string.search_place_nearby, type.getCategoryName())));
         mTextSearchNearby.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
-                int position = 0;
-                for (int i = 0; i < categoryFilterList.length(); i++) {
-                    if (categoryFilterList.getString(i).contains(type)) {
-                        position = i;
-                        break;
-                    }
-                }
-               // getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),position).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+               getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(), type).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
         if (mMap!=null) {
@@ -354,30 +317,10 @@ public class DetailPlaceFragment extends Fragment
     }
     private void updateMap() {
         LatLng latLng = new LatLng(mPlace.getLatitude(),mPlace.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(latLng).title((String) mPlace.getName()));
+        mMap.addMarker(new MarkerOptions().position(latLng).title(mPlace.getName()));
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
         mMap.animateCamera(cameraUpdate);
     }
-   /* private int getType(int type) {
-        switch (type) {
-            case Place.TYPE_LODGING:
-                return 3;
-            case Place.TYPE_FOOD:case Place.TYPE_RESTAURANT:
-                return 0;
-            case Place.TYPE_AMUSEMENT_PARK:case Place.TYPE_MOVIE_THEATER:
-            case Place.TYPE_SHOPPING_MALL:case Place.TYPE_ZOO:
-            case Place.TYPE_PARK:case Place.TYPE_BOWLING_ALLEY:
-                return 1;
-            case Place.TYPE_ATM:case Place.TYPE_BANK:
-                return 2;
-            case Place.TYPE_GROCERY_OR_SUPERMARKET:case Place.TYPE_CONVENIENCE_STORE:
-            case Place.TYPE_DEPARTMENT_STORE:case Place.TYPE_STORE:
-                return 4;
-            case Place.TYPE_HOSPITAL:
-                return 5;
-        }
-        return 1;
-    }*/
     private void setActionBarTitle(String title) {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(title);

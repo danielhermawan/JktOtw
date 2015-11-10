@@ -1,7 +1,6 @@
 package com.favesolution.jktotw.Fragments;
 
 
-import android.content.res.TypedArray;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -74,8 +73,6 @@ public class ListPlacesFragment extends Fragment {
         mType = getArguments().getParcelable(ARG_TYPE);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(mType.getCategoryName()+ " " + getString(R.string.near_you));
-        TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
-        //mCategoryFilter = categoryFilterList.getString(mPosition);
         mClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -225,7 +222,7 @@ public class ListPlacesFragment extends Fragment {
         }
         @Override
         public void onClick(View v) {
-            startActivity(DetailPlaceActivity.newIntent(getActivity(),mPlace.getId(),mPlace.getName()));
+            startActivity(DetailPlaceActivity.newIntent(getActivity(),mPlace));
         }
     }
 

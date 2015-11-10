@@ -1,13 +1,14 @@
 package com.favesolution.jktotw.Networks;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
 import com.favesolution.jktotw.Models.Place;
-import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Models.Type;
+
+import java.util.List;
 
 public class UrlEndpoint {
     private static final String BASE_WEBSERVICE_URL = "http://favesolution.com/jktotw/";
@@ -66,11 +67,11 @@ public class UrlEndpoint {
     }
     public static String searchNearbyPlaceByKeyword(Context context,Location location,String keyword) {
         String filter="";
-        TypedArray filterArray = context.getResources().obtainTypedArray(R.array.category_filter);
-        for (int i = 0; i < filterArray.length()-1; i++) {
+        List<Type> types = Type.getCategory(context);
+        for (int i = 0; i < types.size()-1; i++) {
             if(i!=0)
                 filter+="|";
-            filter+=filterArray.getString(i);
+            filter+=types.get(i).getCategoryFilter();
         }
 
         String stringLocation = location.getLatitude() + "," + location.getLongitude();

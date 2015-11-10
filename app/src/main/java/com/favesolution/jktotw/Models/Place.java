@@ -1,5 +1,6 @@
 package com.favesolution.jktotw.Models;
 
+import android.content.Context;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -25,7 +26,7 @@ public class Place implements Parcelable{
     private String mAddress;
     private float mRating;
     private String mPhoneNumber;
-    private List<String> mTypes;
+    //private List<String> mTypes;
     private String mPhotoRef;
     private Type mType;
     public Place() {
@@ -51,13 +52,6 @@ public class Place implements Parcelable{
         mPhotoRef = photoRef;
     }
 
-    public List<String> getTypes() {
-        return mTypes;
-    }
-
-    public void setTypes(List<String> types) {
-        mTypes = types;
-    }
 
     public String getAddress() {
         return mAddress;
@@ -146,7 +140,7 @@ public class Place implements Parcelable{
         }
         return place;
     }
-    public static Place fromJsonDetail(JSONObject jsonObject) {
+    public static Place fromJsonDetail(JSONObject jsonObject,Context context) {
         Place place = new Place();
         try {
             place.setAddress(jsonObject.getString("formatted_address"));
@@ -162,11 +156,18 @@ public class Place implements Parcelable{
                 place.setPhoneNumber(jsonObject.getString("international_phone_number"));
             place.setName(jsonObject.getString("name"));
             JSONArray types = jsonObject.getJSONArray("types");
-            List<String> listType = new ArrayList<>();
+            List<Type> typeList = Type.getCategory(context);
+            Type type = new Type();
             for (int i = 0; i < types.length(); i++) {
-                listType.add(types.getString(i));
+                for (int j = 0; j < typeList.size(); j++) {
+                    if (typeList.get(j).getCategoryFilter().contains(types.getString(i))) {
+                        type = typeList.get(j);
+                        i=types.length();
+                        break;
+                    }
+                }
             }
-            place.setTypes(listType);
+            place.setType(type);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -207,7 +208,7 @@ public class Place implements Parcelable{
         dest.writeString(this.mAddress);
         dest.writeFloat(this.mRating);
         dest.writeString(this.mPhoneNumber);
-        dest.writeStringList(this.mTypes);
+        //dest.writeStringList(this.mTypes);
         dest.writeString(this.mPhotoRef);
         dest.writeParcelable(this.mType, 0);
     }
@@ -221,7 +222,7 @@ public class Place implements Parcelable{
         this.mAddress = in.readString();
         this.mRating = in.readFloat();
         this.mPhoneNumber = in.readString();
-        this.mTypes = in.createStringArrayList();
+        //this.mTypes = in.createStringArrayList();
         this.mPhotoRef = in.readString();
         this.mType = in.readParcelable(Type.class.getClassLoader());
     }

@@ -1,6 +1,5 @@
 package com.favesolution.jktotw.Fragments;
 
-import android.content.res.TypedArray;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -21,7 +20,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -126,19 +124,8 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
             return;
         LatLng latLngUser = new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude());
         mMap.addMarker(new MarkerOptions().position(latLngUser).title(getString(R.string.you)));
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLngUser, 17);
-        //mMap.animateCamera(cameraUpdate);
-        TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
-        int position = 0;
-        for (int i = 0; i < categoryFilterList.length(); i++) {
-            if (categoryFilterList.getString(i).contains(mPlace.getTypes().get(0))) {
-                position = i;
-                break;
-            }
-        }
-        TypedArray categoryIcon = getResources().obtainTypedArray(R.array.category_icon_marker);
         BitmapDescriptor customMarker = BitmapDescriptorFactory
-                .fromResource(categoryIcon.getResourceId(position, 0));
+                .fromResource(mPlace.getType().getCategoryIconMarker());
         MarkerOptions marker = new MarkerOptions().position(mPlace.getLatLng())
                 .title(mPlace.getName()).icon(customMarker).snippet(mPlace.getAddress());
         mMap.addMarker(marker);

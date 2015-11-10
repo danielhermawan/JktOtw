@@ -57,7 +57,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHold
         @Bind(R.id.text_address_place) TextView mTextAddress;
         private Place mPlace;
         private Context mContext;
-        private GoogleApiClient mClient;
         public SearchHolder(View itemView,Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -66,7 +65,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHold
         }
         @Override
         public void onClick(View v) {
-            mContext.startActivity(DetailPlaceActivity.newIntent(mContext,mPlace.getId(),mPlace.getName()));
+            mContext.startActivity(DetailPlaceActivity.newIntent(mContext,mPlace));
         }
         public void bindView(Place place,GoogleApiClient client) {
             mPlace = place;

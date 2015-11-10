@@ -81,7 +81,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                     public boolean onMarkerClick(Marker marker) {
                         if (marker.equals(activeMarker)) {
                             Place place = mPlaces.get(activeMarkerPosition);
-                            startActivity(DetailPlaceActivity.newIntent(getActivity(),place.getId(),place.getName()));
+                            startActivity(DetailPlaceActivity.newIntent(getActivity(),place));
                         }
                         for (int i = 0; i < mMarkers.size(); i++) {
                             if (marker.equals(mMarkers.get(i))) {
