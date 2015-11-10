@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Activities.SearchActivity;
 import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.R;
@@ -80,7 +81,7 @@ public class HomeFragment extends Fragment {
         }
         @Override
         public void onClick(View v) {
-            //getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),mPosition));
+            getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(), mType));
         }
     }
 

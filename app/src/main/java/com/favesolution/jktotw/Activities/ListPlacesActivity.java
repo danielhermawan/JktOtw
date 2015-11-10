@@ -11,13 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.favesolution.jktotw.Fragments.ListPlacesFragment;
+import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.R;
 import com.favesolution.jktotw.Utils.UIHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public class ListPlacesActivity extends AppCompatActivity {
-    private static final String EXTRA_POSITION = "extra_position";
+    private static final String EXTRA_TYPE = "extra_type";
     private static final int REQUEST_ERROR = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +27,12 @@ public class ListPlacesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        int position = getIntent().getIntExtra(EXTRA_POSITION,0);
+        //int position = getIntent().getIntExtra(EXTRA_TYPE,0);
+        Type type = getIntent().getParcelableExtra(EXTRA_TYPE);
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.content_frame);
         if(fragment == null){
-            fragment = ListPlacesFragment.newInstance(position);
+            fragment = ListPlacesFragment.newInstance(type);
             fm.beginTransaction().add(R.id.content_frame,fragment).commit();
         }
         UIHelper.showOverflowMenu(this);
@@ -53,9 +55,9 @@ public class ListPlacesActivity extends AppCompatActivity {
         }
     }
 
-    public static Intent newIntent(Context context,int position) {
+    public static Intent newIntent(Context context,Type type) {
         Intent i = new Intent(context,ListPlacesActivity.class);
-        i.putExtra(EXTRA_POSITION,position);
+        i.putExtra(EXTRA_TYPE,type);
         return i;
     }
 }

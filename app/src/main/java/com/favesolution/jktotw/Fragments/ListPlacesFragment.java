@@ -25,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DetailPlaceActivity;
 import com.favesolution.jktotw.Activities.MapPlaceActivity;
 import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.Networks.CustomJsonRequest;
 import com.favesolution.jktotw.Networks.RequestQueueSingleton;
 import com.favesolution.jktotw.Networks.UrlEndpoint;
@@ -47,18 +48,19 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class ListPlacesFragment extends Fragment {
-    private static final String ARG_POSITION = "arg_position";
+    private static final String ARG_TYPE= "arg_type";
     @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
     @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
     private List<Place> mPlaces = new ArrayList<>();
-    private String mCategoryFilter;
+    //private String mCategoryFilter;
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
-    private int mPosition;
-    public static ListPlacesFragment newInstance(int position) {
+    private Type mType;
+   // private int mPosition;
+    public static ListPlacesFragment newInstance(Type type) {
         ListPlacesFragment fragment = new ListPlacesFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_POSITION, position);
+        args.putParcelable(ARG_TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,13 +70,12 @@ public class ListPlacesFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         setRetainInstance(true);
-        mPosition = getArguments().getInt(ARG_POSITION);
+        //mPosition = getArguments().getInt(ARG_TYPE);
+        mType = getArguments().getParcelable(ARG_TYPE);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        actionBar.setTitle(getResources()
-                .obtainTypedArray(R.array.categories)
-                .getString(mPosition) + " " + getString(R.string.near_you));
+        actionBar.setTitle(mType.getCategoryName()+ " " + getString(R.string.near_you));
         TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
-        mCategoryFilter = categoryFilterList.getString(mPosition);
+        //mCategoryFilter = categoryFilterList.getString(mPosition);
         mClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
@@ -141,7 +142,7 @@ public class ListPlacesFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_see_map:
-                startActivity(MapPlaceActivity.newIntent(getActivity(),mPosition));
+                startActivity(MapPlaceActivity.newIntent(getActivity(),mType));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -164,7 +165,7 @@ public class ListPlacesFragment extends Fragment {
             RequestQueueSingleton.getInstance(getActivity())
                     .getRequestQueue()
                     .cancelAll(this);
-            final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mCategoryFilter);
+            final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mType.getCategoryFilter());
             CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

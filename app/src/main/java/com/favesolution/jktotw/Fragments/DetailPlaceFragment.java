@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DirectionActivity;
-import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
@@ -345,7 +344,7 @@ public class DetailPlaceFragment extends Fragment
                         break;
                     }
                 }
-                getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),position).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+               // getActivity().startActivity(ListPlacesActivity.newIntent(getActivity(),position).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
         if (mMap!=null) {

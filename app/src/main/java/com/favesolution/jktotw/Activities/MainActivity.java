@@ -17,9 +17,12 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.favesolution.jktotw.Fragments.HomeFragment;
+import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.R;
 import com.favesolution.jktotw.Utils.SharedPreference;
 import com.favesolution.jktotw.Utils.UIHelper;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
+                List<Type> types = Type.getCategory(MainActivity.this);
                 switch (item.getItemId()) {
                     case R.id.navigation_item_login:
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -61,25 +65,25 @@ public class MainActivity extends AppCompatActivity {
                         setActiveContent(HomeFragment.newInstance());
                         return true;
                     case R.id.navigation_item_food:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 0));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(0)));
                         return true;
                     case R.id.navigation_item_entertaiment:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 1));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(1)));
                         return true;
                     case R.id.navigation_item_atm:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 2));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(2)));
                         return true;
                     case R.id.navigation_item_hotel:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 3));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(3)));
                         return true;
                     case R.id.navigation_item_shooping:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 4));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(4)));
                         return true;
                     case R.id.navigation_item_hospital:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 5));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(5)));
                         return true;
                     case R.id.navigation_item_hotspot:
-                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, 6));
+                        startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(6)));
                         return true;
                     case R.id.navigation_item_profile:
                         return true;

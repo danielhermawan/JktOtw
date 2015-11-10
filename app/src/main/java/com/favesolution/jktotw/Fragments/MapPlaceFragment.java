@@ -1,6 +1,5 @@
 package com.favesolution.jktotw.Fragments;
 
-import android.content.res.TypedArray;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -13,6 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DetailPlaceActivity;
 import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.Networks.CustomJsonRequest;
 import com.favesolution.jktotw.Networks.RequestQueueSingleton;
 import com.favesolution.jktotw.Networks.UrlEndpoint;
@@ -43,19 +43,19 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  */
 public class MapPlaceFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks {
-    private static final String ARG_POSITION = "arg_position";
+    private static final String ARG_TYPE = "arg_type";
     private List<Place> mPlaces;
     private List<Marker> mMarkers = new ArrayList<>();
-    private String mCategoryFilter;
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
-    private int mPosition;
+    //private int mPosition;
+    private Type mType;
     private Marker activeMarker;
     private int activeMarkerPosition;
     private GoogleMap mMap;
-    public static MapPlaceFragment newInstance(int position) {
+    public static MapPlaceFragment newInstance(Type type) {
         Bundle args = new Bundle();
-        args.putInt(ARG_POSITION, position);
+        args.putParcelable(ARG_TYPE, type);
         MapPlaceFragment fragment = new MapPlaceFragment();
         fragment.setArguments(args);
         return fragment;
@@ -65,13 +65,9 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mPosition = getArguments().getInt(ARG_POSITION);
+        mType = getArguments().getParcelable(ARG_TYPE);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        actionBar.setTitle(getResources()
-                .obtainTypedArray(R.array.categories)
-                .getString(mPosition) + " " + getString(R.string.near_you));
-        TypedArray categoryFilterList = getResources().obtainTypedArray(R.array.category_filter);
-        mCategoryFilter = categoryFilterList.getString(mPosition);
+        actionBar.setTitle(mType.getCategoryName() + " " + getString(R.string.near_you));
         mClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -156,9 +152,8 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
         mMap.animateCamera(cameraUpdate);
         if(mPlaces==null)
             return;
-        TypedArray categoryIcon = getResources().obtainTypedArray(R.array.category_icon_marker);
         BitmapDescriptor customMarker = BitmapDescriptorFactory
-        .fromResource(categoryIcon.getResourceId(mPosition,0));
+        .fromResource(mType.getCategoryIconMarker());
         for (Place place:mPlaces) {
             MarkerOptions marker = new MarkerOptions().position(place.getLatLng())
                     .title(place.getName()).icon(customMarker).snippet(place.getAddress());
@@ -170,7 +165,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
         RequestQueueSingleton.getInstance(getActivity())
                 .getRequestQueue()
                 .cancelAll(this);
-        final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mCategoryFilter);
+        final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mType.getCategoryFilter());
         CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
