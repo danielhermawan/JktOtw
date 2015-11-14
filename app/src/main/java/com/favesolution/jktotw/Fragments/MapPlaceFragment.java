@@ -2,9 +2,12 @@ package com.favesolution.jktotw.Fragments;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -44,12 +47,13 @@ import java.util.List;
  */
 public class MapPlaceFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks {
     private static final String ARG_TYPE = "arg_type";
-    private List<Place> mPlaces;
+    private List<Place> mPlaces = new ArrayList<>();
     private List<Marker> mMarkers = new ArrayList<>();
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
     //private int mPosition;
     private Type mType;
+    private String mNextToken = "";
     private Marker activeMarker;
     private int activeMarkerPosition;
     private GoogleMap mMap;
@@ -65,6 +69,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
         mType = getArguments().getParcelable(ARG_TYPE);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(mType.getCategoryName() + " " + getString(R.string.near_you));
@@ -81,7 +86,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                     public boolean onMarkerClick(Marker marker) {
                         if (marker.equals(activeMarker)) {
                             Place place = mPlaces.get(activeMarkerPosition);
-                            startActivity(DetailPlaceActivity.newIntent(getActivity(),place));
+                            startActivity(DetailPlaceActivity.newIntent(getActivity(), place));
                         }
                         for (int i = 0; i < mMarkers.size(); i++) {
                             if (marker.equals(mMarkers.get(i))) {
@@ -97,11 +102,30 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
             }
         });
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_map, menu);
+        if (mNextToken.equals("")) {
+            menu.findItem(R.id.menu_reload_more).setEnabled(false);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 getActivity().onBackPressed();
+                return true;
+            case R.id.menu_reload_more:
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        reloadMorePlace();
+                    }
+                },1000);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -161,29 +185,88 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
             mMarkers.add(m);
         }
     }
+    private void reloadMorePlace() {
+        if (!mNextToken.equals("") && !mType.getCategoryName().equals(getString(R.string.category_indosat))) {
+            String url = UrlEndpoint.loadMorePlace(mNextToken);
+            CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray result = response.getJSONArray("results");
+                        mPlaces.addAll(Place.fromJson(result, mCurrentLocation, getActivity()));
+                        if (response.has("next_page_token")) {
+                            mNextToken = response.getString("next_page_token");
+                        } else {
+                            mNextToken = "";
+                        }
+                        getActivity().invalidateOptionsMenu();
+                        updateMap();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error", error.getMessage());
+                }
+            });
+            placeRequest.setTag(this);
+            RequestQueueSingleton.getInstance(getActivity())
+                    .addToRequestQueue(placeRequest);
+        }
+    }
     private void refreshPlace() {
         RequestQueueSingleton.getInstance(getActivity())
                 .getRequestQueue()
                 .cancelAll(this);
-        final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mType.getCategoryFilter(),getActivity());
-        CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray result = response.getJSONArray("results");
-                    mPlaces = Place.fromJson(result,mCurrentLocation,getActivity());
-                    updateMap();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        CustomJsonRequest placeRequest;
+        if (mType.getCategoryName().equals(getString(R.string.category_indosat))) {
+            final String url = UrlEndpoint.getHotspot();
+            placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray result = response.getJSONArray("results");
+                        mPlaces = Place.fromJsonHotspot(result,mCurrentLocation,getActivity());
+                        updateMap();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                Log.e("error", error.getMessage());
-            }
-        });
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error", error.getMessage());
+                }
+            });
+        } else {
+            final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mType.getCategoryFilter(),getActivity());
+            placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray result = response.getJSONArray("results");
+                        mPlaces.addAll(Place.fromJson(result, mCurrentLocation, getActivity()));
+                        if (response.has("next_page_token")) {
+                            mNextToken = response.getString("next_page_token");
+                        }
+                        getActivity().invalidateOptionsMenu();
+                        updateMap();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error", error.getMessage());
+                }
+            });
+        }
         placeRequest.setTag(this);
         RequestQueueSingleton.getInstance(getActivity())
                 .addToRequestQueue(placeRequest);

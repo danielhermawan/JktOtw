@@ -87,4 +87,5 @@
     <string name="no_photo">There is no photo yet\nAdd it if you want</string>
     <string name="all_place">All Place</string>
     <string name="loading_more_item">Loading more place</string>
+    <string name="Reload_place">Reload More Place</string>
 </resources>

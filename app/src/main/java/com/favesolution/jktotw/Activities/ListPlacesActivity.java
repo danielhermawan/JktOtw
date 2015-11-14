@@ -20,6 +20,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 public class ListPlacesActivity extends AppCompatActivity {
     private static final String EXTRA_TYPE = "extra_type";
     private static final int REQUEST_ERROR = 0;
+    private Type mType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,11 +29,11 @@ public class ListPlacesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //int position = getIntent().getIntExtra(EXTRA_TYPE,0);
-        Type type = getIntent().getParcelableExtra(EXTRA_TYPE);
+        mType = getIntent().getParcelableExtra(EXTRA_TYPE);
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.content_frame);
         if(fragment == null){
-            fragment = ListPlacesFragment.newInstance(type);
+            fragment = ListPlacesFragment.newInstance(mType);
             fm.beginTransaction().add(R.id.content_frame,fragment).commit();
         }
         UIHelper.showOverflowMenu(this);
@@ -54,7 +55,13 @@ public class ListPlacesActivity extends AppCompatActivity {
             errorDialog.show();
         }
     }
-
+    @Override
+    public void startActivity(Intent intent) {
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            intent.putExtra(SearchActivity.EXTRA_CATEGORY, mType.getCategoryFilter());
+        }
+        super.startActivity(intent);
+    }
     public static Intent newIntent(Context context,Type type) {
         Intent i = new Intent(context,ListPlacesActivity.class);
         i.putExtra(EXTRA_TYPE,type);

@@ -30,7 +30,7 @@ import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DetailPlaceActivity;
 import com.favesolution.jktotw.Activities.MapPlaceActivity;
 import com.favesolution.jktotw.Activities.SearchActivity;
-import com.favesolution.jktotw.Adapters.ProgressViewHolder;
+import com.favesolution.jktotw.Adapters.RecyclerViewFooterAdapter;
 import com.favesolution.jktotw.Interfaces.OnLoadMoreListener;
 import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.Models.Type;
@@ -124,7 +124,19 @@ public class ListPlacesFragment extends Fragment {
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST);
         mRecyclerView.addItemDecoration(itemDecoration);
-        setupAdapter();
+        PlacesAdapter placesAdapter = new PlacesAdapter(mRecyclerView, mPlaces, new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadMorePlace();
+                    }
+                },1000);
+            }
+        });
+        mRecyclerView.setAdapter(placesAdapter);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
                 android.R.color.holo_green_light,
                 R.color.colorAccent,
@@ -132,7 +144,9 @@ public class ListPlacesFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshPlace();
+                /*((PlacesAdapter)mRecyclerView.getAdapter()).resetItems(new ArrayList<Place>());
+                refreshPlace();*/
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
         return v;
@@ -146,6 +160,9 @@ public class ListPlacesFragment extends Fragment {
         SearchView searchView = (SearchView) menu.findItem(R.id.item_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getActivity(), SearchActivity.class)));
         searchView.setIconifiedByDefault(true);
+        if (mType.getCategoryName().equals(getString(R.string.category_indosat))) {
+            menu.findItem(R.id.item_search).setVisible(false);
+        }
     }
 
     @Override
@@ -184,17 +201,16 @@ public class ListPlacesFragment extends Fragment {
             CustomJsonRequest loadMoreRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    mPlaces.remove(mPlaces.size() - 1);
-                    mRecyclerView.getAdapter().notifyItemRemoved(mPlaces.size());
-                    ((PlacesAdapter)mRecyclerView.getAdapter()).setLoaded();
                     JSONArray result = null;
                     try {
                         result = response.getJSONArray("results");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    ((PlacesAdapter)(mRecyclerView.getAdapter()))
-                            .addAll(Place.fromJson(result, mCurrentLocation, getActivity()));
+                    ((PlacesAdapter) (mRecyclerView.getAdapter()))
+                            .removeItem(null);
+                    ((PlacesAdapter) (mRecyclerView.getAdapter()))
+                            .addItems(Place.fromJson(result, mCurrentLocation, getActivity()));
                     if (response.has("next_page_token")) {
                         try {
                             mNextToken = response.getString("next_page_token");
@@ -203,6 +219,8 @@ public class ListPlacesFragment extends Fragment {
                         }
                     } else {
                         mNextToken = "";
+                        ((PlacesAdapter) (mRecyclerView.getAdapter()))
+                                .stopLoading();
                     }
                 }
             }, new Response.ErrorListener() {
@@ -215,6 +233,9 @@ public class ListPlacesFragment extends Fragment {
             loadMoreRequest.setTag(this);
             RequestQueueSingleton.getInstance(getActivity())
                     .addToRequestQueue(loadMoreRequest);
+        } else {
+            ((PlacesAdapter) (mRecyclerView.getAdapter()))
+                    .stopLoading();
         }
     }
     private void refreshPlace() {
@@ -231,8 +252,7 @@ public class ListPlacesFragment extends Fragment {
                         try {
                             JSONArray result = response.getJSONArray("results");
                             mPlaces = Place.fromJsonHotspot(result,mCurrentLocation,getActivity());
-                            clearAdapter();
-                            setupAdapter();
+                            ((PlacesAdapter)mRecyclerView.getAdapter()).addItems(mPlaces);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -257,9 +277,7 @@ public class ListPlacesFragment extends Fragment {
                             if (response.has("next_page_token")) {
                                 mNextToken = response.getString("next_page_token");
                             }
-                            clearAdapter();
-                            setupAdapter();
-
+                            ((PlacesAdapter)mRecyclerView.getAdapter()).addItems(mPlaces);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -280,34 +298,6 @@ public class ListPlacesFragment extends Fragment {
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
         }
-    }
-    private void clearAdapter() {
-        if (mRecyclerView!=null && mRecyclerView.getAdapter() != null) {
-            ((PlacesAdapter)mRecyclerView.getAdapter()).clear();
-        }
-    }
-    private void setupAdapter() {
-        if(mRecyclerView.getAdapter() == null) {
-            final PlacesAdapter placesAdapter = new PlacesAdapter(mPlaces,mRecyclerView);
-            mRecyclerView.setAdapter(placesAdapter);
-            placesAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
-                @Override
-                public void onLoadMore() {
-                    mPlaces.add(null);
-                    placesAdapter.notifyItemInserted(mPlaces.size() - 1);
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadMorePlace();
-                        }
-                    }, 1000);
-                }
-            });
-
-        }
-        else
-            ((PlacesAdapter)mRecyclerView.getAdapter()).addAll(mPlaces);
     }
     private class PlacesHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
@@ -333,75 +323,27 @@ public class ListPlacesFragment extends Fragment {
         }
     }
 
-    private class PlacesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        private List<Place> mPlaceItems = new ArrayList<>();
-        private final int VIEW_ITEM = 1;
-        private final int VIEW_PROG = 0;
-        private int visibleThreshold = 2;
-        private int lastVisibleItem, totalItemCount;
-        private boolean loading;
-        private OnLoadMoreListener onLoadMoreListener;
+    private class PlacesAdapter extends RecyclerViewFooterAdapter<Place> {
 
-        public PlacesAdapter(List<Place> places,RecyclerView recyclerView) {
-            mPlaceItems = places;
-            if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
-                final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        totalItemCount = linearLayoutManager.getItemCount();
-                        lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                        if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                            // End has been reached
-                            // Do something
-                            if (onLoadMoreListener != null) {
-                                onLoadMoreListener.onLoadMore();
-                            }
-                            loading = true;
-                        }
-                    }
-                });
-            }
-        }
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            RecyclerView.ViewHolder vh;
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            if (viewType == VIEW_ITEM) {
-                View v = inflater.inflate(R.layout.list_places,parent,false);
-                vh = new PlacesHolder(v);
-            } else {
-                View v = inflater.inflate(R.layout.progress_item,parent,false);
-                vh = new ProgressViewHolder(v);
-            }
-            return vh;
+        public PlacesAdapter(RecyclerView recyclerView, List<Place> dataSet, OnLoadMoreListener onLoadMoreListener) {
+            super(recyclerView, dataSet, onLoadMoreListener);
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            Place place = mPlaceItems.get(position);
-            if (holder instanceof PlacesHolder) {
-                ((PlacesHolder) (holder)).bindPlacesItem(place);
-            } else {
-                ((ProgressViewHolder)holder).progressBar.setIndeterminate(true);
-            }
-
+        public RecyclerView.ViewHolder onCreateBasicItemViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.list_places,parent,false);
+            return new PlacesHolder(v);
         }
 
         @Override
-        public int getItemCount() {
-            return mPlaceItems.size();
+        public void onBindBasicItemView(RecyclerView.ViewHolder genericHolder, int position) {
+            PlacesHolder placesHolder = (PlacesHolder)genericHolder;
+            Place place = getItem(position);
+            placesHolder.bindPlacesItem(place);
         }
 
-        public void setLoaded() {
-            loading = false;
-        }
-        @Override
-        public int getItemViewType(int position) {
-            return mPlaceItems.get(position)!=null?VIEW_ITEM:VIEW_PROG;
-        }
-        public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        /*public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
             this.onLoadMoreListener = onLoadMoreListener;
         }
         public void clear() {
@@ -412,6 +354,6 @@ public class ListPlacesFragment extends Fragment {
             mPlaceItems.addAll(list);
             notifyDataSetChanged();
 
-        }
+        }*/
     }
 }

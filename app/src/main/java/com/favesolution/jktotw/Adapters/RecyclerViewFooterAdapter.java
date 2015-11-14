@@ -16,7 +16,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public abstract class AbstractRecyclerViewFooterAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class RecyclerViewFooterAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final int VISIBLE_THRESHOLD = 5;
 
@@ -27,8 +27,8 @@ public abstract class AbstractRecyclerViewFooterAdapter<T> extends RecyclerView.
 
     private int firstVisibleItem, visibleItemCount, totalItemCount, previousTotal = 0;
     private boolean loading = true;
-
-    public AbstractRecyclerViewFooterAdapter
+    private boolean endLoading = false;
+    public RecyclerViewFooterAdapter
             (RecyclerView recyclerView, List<T> dataSet, final OnLoadMoreListener onLoadMoreListener) {
         this.dataSet = dataSet;
 
@@ -41,7 +41,7 @@ public abstract class AbstractRecyclerViewFooterAdapter<T> extends RecyclerView.
                     visibleItemCount = linearLayoutManager.getChildCount();
                     firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
 
-                    if (loading) {
+                    if (loading && !endLoading) {
                         if (totalItemCount > previousTotal) {
                             loading = false;
                             previousTotal = totalItemCount;
@@ -61,9 +61,9 @@ public abstract class AbstractRecyclerViewFooterAdapter<T> extends RecyclerView.
             });
         }
     }
-
-    public int getFirstVisibleItem() {
-        return firstVisibleItem;
+    public void stopLoading() {
+        endLoading = true;
+        removeItem(null);
     }
 
     public void resetItems(@NonNull List<T> newDataSet) {
@@ -105,9 +105,6 @@ public abstract class AbstractRecyclerViewFooterAdapter<T> extends RecyclerView.
         }
     }
 
-    public List<T> getDataSet() {
-        return dataSet;
-    }
 
     @Override
     public int getItemViewType(int position) {
@@ -144,7 +141,6 @@ public abstract class AbstractRecyclerViewFooterAdapter<T> extends RecyclerView.
     public abstract void onBindBasicItemView(RecyclerView.ViewHolder genericHolder, int position);
 
     public RecyclerView.ViewHolder onCreateFooterViewHolder(ViewGroup parent, int viewType) {
-        //noinspection ConstantConditions
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.progress_item, parent, false);
         return new ProgressViewHolder(v);
