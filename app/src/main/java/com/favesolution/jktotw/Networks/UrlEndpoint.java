@@ -3,7 +3,6 @@ package com.favesolution.jktotw.Networks;
 import android.content.Context;
 import android.location.Location;
 import android.net.Uri;
-import android.util.Log;
 
 import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.Models.Type;
@@ -41,6 +40,16 @@ public class UrlEndpoint {
     public static String loginUser() {
         return BASE_WEBSERVICE_URL+"user/Login/"+API_JKTOTW_KEY;
     }
+    public static String getHotspot() {
+        return BASE_WEBSERVICE_URL+"hotspot/gethotspot/"+API_JKTOTW_KEY;
+    }
+
+    public static String getHotspotPhoto(String hotspotId) {
+        return BASE_WEBSERVICE_URL+"image/getImagebyHotspotID/"+API_JKTOTW_KEY+"/"+hotspotId;
+    }
+    public static String insertImage() {
+        return BASE_WEBSERVICE_URL+"image/insertImage/"+API_JKTOTW_KEY;
+    }
     public static String searchNearbyPlaceByRadius(Location location, String type,String radius) {
         if (radius == null) {
             radius = DEFAULT_RADIUS;
@@ -60,6 +69,26 @@ public class UrlEndpoint {
                 .appendQueryParameter("location", stringLocation)
                 .toString();
     }
+    public static String searchNearbyPlace(Location location, String type,Context context) {
+        String stringLocation = location.getLatitude() + "," + location.getLongitude();
+        String filter="";
+        if (type.equals("all")) {
+            List<Type> types = Type.getCategory(context);
+            for (int i = 0; i < types.size() - 1; i++) {
+                if (i != 0)
+                    filter += "|";
+                filter += types.get(i).getCategoryFilter();
+            }
+        } else {
+            filter = type;
+        }
+        return URL_SEARCH_PLACE.buildUpon()
+                .appendQueryParameter("rankby", "distance")
+                .appendQueryParameter("types", filter)
+                .appendQueryParameter("location", stringLocation)
+                .toString();
+    }
+
     public static String getDetailPlace(String placeId) {
         return URL_DETAIL_PLACE.buildUpon()
                 .appendQueryParameter("placeid",placeId)
@@ -75,7 +104,15 @@ public class UrlEndpoint {
         }
 
         String stringLocation = location.getLatitude() + "," + location.getLongitude();
-        Log.d("debug",filter);
+        return URL_SEARCH_PLACE.buildUpon()
+                .appendQueryParameter("rankby", "distance")
+                .appendQueryParameter("location", stringLocation)
+                .appendQueryParameter("keyword", keyword)
+                .appendQueryParameter("types", filter)
+                .toString();
+    }
+    public static String searchNearbyPlaceByKeyword(Context context,Location location,String keyword,String filter) {
+        String stringLocation = location.getLatitude() + "," + location.getLongitude();
         return URL_SEARCH_PLACE.buildUpon()
                 .appendQueryParameter("rankby", "distance")
                 .appendQueryParameter("location", stringLocation)

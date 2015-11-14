@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -45,10 +47,13 @@ import butterknife.ButterKnife;
 
 public class SearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
     @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
+    @Bind(R.id.progressBar) ProgressBar mProgressBar;
+    public static final String EXTRA_CATEGORY = "extra_category";
     private ArrayList<Place> mPlaces = new ArrayList<>();
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
     private String mQuery;
+    private String mFilter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +68,11 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
         mRecyclerView.addItemDecoration(itemDecoration);
+        showProgressBar(true);
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mQuery = intent.getStringExtra(SearchManager.QUERY);
+            mFilter = intent.getStringExtra(EXTRA_CATEGORY);
         }
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -95,7 +102,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         SearchView searchView = (SearchView) menu.findItem(R.id.item_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
-        searchView.setQuery(mQuery,false);
+        searchView.setQuery(mQuery, false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -139,13 +146,18 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         RequestQueueSingleton.getInstance(this)
                 .getRequestQueue()
                 .cancelAll(this);
-        final String url = UrlEndpoint.searchNearbyPlaceByKeyword(this,mCurrentLocation, mQuery);
+        final String url;
+        if (mFilter == null || mFilter.equals("")) {
+            url = UrlEndpoint.searchNearbyPlaceByKeyword(this, mCurrentLocation, mQuery);
+        } else {
+            url = UrlEndpoint.searchNearbyPlaceByKeyword(this, mCurrentLocation, mQuery,mFilter);
+        }
         CustomJsonRequest searchRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray result = response.getJSONArray("results");
-                    mPlaces = Place.fromJson(result, mCurrentLocation);
+                    mPlaces = Place.fromJson(result, mCurrentLocation,SearchActivity.this);
                     SearchActivity.this.startService(FetchAddressIntentService.newIntent(
                             SearchActivity.this,
                             mPlaces,
@@ -154,6 +166,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                                 protected void onReceiveResult(int resultCode, Bundle resultData) {
                                     mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
                                     setupAdapter();
+                                    showProgressBar(false);
                                 }
                             }
                     ));
@@ -173,8 +186,14 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                 .addToRequestQueue(searchRequest);
     }
     private void setupAdapter() {
-        mRecyclerView.setAdapter(new SearchAdapter(mPlaces,mClient));
+        mRecyclerView.setAdapter(new SearchAdapter(mPlaces, mClient));
     }
 
-
+    private void showProgressBar(boolean isShow) {
+        if (isShow) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else{
+            mProgressBar.setVisibility(View.GONE);
+        }
+    }
 }

@@ -152,9 +152,9 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
         mMap.animateCamera(cameraUpdate);
         if(mPlaces==null)
             return;
-        BitmapDescriptor customMarker = BitmapDescriptorFactory
-        .fromResource(mType.getCategoryIconMarker());
         for (Place place:mPlaces) {
+            BitmapDescriptor customMarker = BitmapDescriptorFactory
+                    .fromResource(place.getType().getCategoryIconMarker());
             MarkerOptions marker = new MarkerOptions().position(place.getLatLng())
                     .title(place.getName()).icon(customMarker).snippet(place.getAddress());
             Marker m = mMap.addMarker(marker);
@@ -165,13 +165,13 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
         RequestQueueSingleton.getInstance(getActivity())
                 .getRequestQueue()
                 .cancelAll(this);
-        final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mType.getCategoryFilter());
+        final String url = UrlEndpoint.searchNearbyPlace(mCurrentLocation, mType.getCategoryFilter(),getActivity());
         CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray result = response.getJSONArray("results");
-                    mPlaces = Place.fromJson(result,mCurrentLocation);
+                    mPlaces = Place.fromJson(result,mCurrentLocation,getActivity());
                     updateMap();
                 } catch (JSONException e) {
                     e.printStackTrace();

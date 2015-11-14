@@ -89,7 +89,7 @@
                 android:layout_marginRight="@dimen/login_horizontal_space"
                 android:hint="@string/confirm_password_login"
                 android:imeActionLabel="@string/register"
-                android:imeActionId="@+id/login"
+                android:imeActionId="@+id/register_ime"
                 android:imeOptions="actionUnspecified"
                 android:inputType="textPassword"
                 style="@style/InverseText.LoginEditText"/>
@@ -145,19 +145,19 @@
                 android:inputType="textEmailAddress"
                 android:hint="@string/email_hint_login"
                 style="@style/InverseText.LoginEditText"/>
-            <EditText
-                android:id="@+id/password_edit_login"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_marginLeft="@dimen/login_horizontal_space"
-                android:layout_marginRight="@dimen/login_horizontal_space"
-                android:hint="@string/email_password_login"
-                android:imeActionLabel="@string/ime_login"
-                android:imeActionId="@+id/login"
-                android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
-                style="@style/InverseText.LoginEditText"/>
+                <EditText
+                    android:id="@+id/password_edit_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginLeft="@dimen/login_horizontal_space"
+                    android:layout_marginRight="@dimen/login_horizontal_space"
+                    android:hint="@string/email_password_login"
+                    android:imeActionLabel="@string/ime_login"
+                    android:imeActionId="@+id/login_ime"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    style="@style/InverseText.LoginEditText"/>
             <Button
                 android:id="@+id/button_login"
                 android:layout_width="match_parent"

@@ -12,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -28,8 +30,17 @@ public class Place implements Parcelable{
     private String mPhoneNumber;
     //private List<String> mTypes;
     private String mPhotoRef;
+    private List<String> mPhotoRefs;
     private Type mType;
     public Place() {
+    }
+
+    public List<String> getPhotoRefs() {
+        return mPhotoRefs;
+    }
+
+    public void setPhotoRefs(List<String> photoRefs) {
+        mPhotoRefs = photoRefs;
     }
 
     public LatLng getLatLng() {
@@ -117,7 +128,7 @@ public class Place implements Parcelable{
         mName = name;
     }
 
-    public static Place fromJson(JSONObject jsonObject,Location userLocation) {
+    public static Place fromJson(JSONObject jsonObject,Location userLocation,Context context) {
         Place place = new Place();
         try {
             place.mId =  jsonObject.getString("place_id");
@@ -134,6 +145,19 @@ public class Place implements Parcelable{
                 JSONObject photo = photos.getJSONObject(0);
                 place.mPhotoRef = photo.getString("photo_reference");
             }
+            JSONArray types = jsonObject.getJSONArray("types");
+            List<Type> typeList = Type.getCategory(context);
+            Type type = new Type();
+            for (int i = 0; i < types.length(); i++) {
+                for (int j = 0; j < typeList.size(); j++) {
+                    if (typeList.get(j).getCategoryFilter().contains(types.getString(i))) {
+                        type = typeList.get(j);
+                        i=types.length();
+                        break;
+                    }
+                }
+            }
+            place.setType(type);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -167,6 +191,14 @@ public class Place implements Parcelable{
                     }
                 }
             }
+            place.setPhotoRefs(new ArrayList<String>());
+            if (jsonObject.has("photos")) {
+                JSONArray photos = jsonObject.getJSONArray("photos");
+                for (int i = 0; i < photos.length(); i++) {
+                    JSONObject photo = photos.getJSONObject(i);
+                    place.getPhotoRefs().add(photo.getString("photo_reference"));
+                }
+            }
             place.setType(type);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -174,7 +206,7 @@ public class Place implements Parcelable{
         }
         return place;
     }
-    public static ArrayList<Place> fromJson(JSONArray jsonArray,Location userLocation) {
+    public static ArrayList<Place> fromJson(JSONArray jsonArray,Location userLocation,Context context) {
         ArrayList<Place> places = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject placeJson;
@@ -184,14 +216,55 @@ public class Place implements Parcelable{
                 e.printStackTrace();
                 continue;
             }
-            Place place = Place.fromJson(placeJson,userLocation);
+            Place place = Place.fromJson(placeJson,userLocation,context);
             if (place != null) {
                 places.add(place);
             }
         }
         return places;
     }
-
+    public static ArrayList<Place> fromJsonHotspot(JSONArray jsonArray,Location userLocation,Context context) {
+        ArrayList<Place> places = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject placeJson;
+            try {
+                placeJson=jsonArray.getJSONObject(i);
+                Place place = new Place();
+                place.setName(placeJson.getString("NamaHotspot"));
+                place.setAddress(placeJson.getString("Alamat"));
+                if (!placeJson.getString("PhoneNumber").equals("")) {
+                    place.setPhoneNumber(placeJson.getString("PhoneNumber"));
+                }
+                place.setLatitude(Double.parseDouble(placeJson.getString("Latitude")));
+                place.setId(placeJson.getString("HotspotID"));
+                place.setLongitude(Double.parseDouble(placeJson.getString("Longitude")));
+                Location locationPlace = new Location("");
+                locationPlace.setLatitude(place.getLatitude());
+                locationPlace.setLongitude(place.getLongitude());
+                place.setDistance(userLocation.distanceTo(locationPlace));
+                place.setType(Type.getCategory(context).get(6));
+                place.setRating(0);
+                places.add(place);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            /*Place place = Place.fromJson(placeJson,userLocation);
+            if (place != null) {
+                places.add(place);
+            }*/
+        }
+        Collections.sort(places, new Comparator<Place>() {
+            @Override
+            public int compare(Place lhs, Place rhs) {
+                if (lhs.getDistance() < rhs.getDistance()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
+        return places;
+    }
 
     @Override
     public int describeContents() {
@@ -208,8 +281,8 @@ public class Place implements Parcelable{
         dest.writeString(this.mAddress);
         dest.writeFloat(this.mRating);
         dest.writeString(this.mPhoneNumber);
-        //dest.writeStringList(this.mTypes);
         dest.writeString(this.mPhotoRef);
+        dest.writeStringList(this.mPhotoRefs);
         dest.writeParcelable(this.mType, 0);
     }
 
@@ -222,8 +295,8 @@ public class Place implements Parcelable{
         this.mAddress = in.readString();
         this.mRating = in.readFloat();
         this.mPhoneNumber = in.readString();
-        //this.mTypes = in.createStringArrayList();
         this.mPhotoRef = in.readString();
+        this.mPhotoRefs = in.createStringArrayList();
         this.mType = in.readParcelable(Type.class.getClassLoader());
     }
 

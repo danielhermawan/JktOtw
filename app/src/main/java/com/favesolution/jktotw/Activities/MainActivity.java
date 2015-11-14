@@ -95,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(i);
                         finish();
                         return true;
+                    case R.id.navigation_item_map:
+                        Type type = new Type();
+                        type.setCategoryName(getString(R.string.all_place));
+                        type.setCategoryFilter("all");
+                        startActivity(MapPlaceActivity.newIntent(MainActivity.this,type));
+                        return true;
                     default:
                         return true;
                 }

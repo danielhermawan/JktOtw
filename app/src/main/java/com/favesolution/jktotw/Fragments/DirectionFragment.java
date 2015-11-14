@@ -39,12 +39,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import icepick.Icepick;
+import icepick.State;
+
 /**
  * Created by Daniel on 11/9/2015 for JktOtw project.
  */
 public class DirectionFragment extends SupportMapFragment implements GoogleApiClient.ConnectionCallbacks {
     private static final String ARG_PLACE = "arg_place";
-    private Place mPlace;
+    @State Place mPlace;
     private GoogleApiClient mClient;
     private GoogleMap mMap;
     private Location mCurrentLocation;
@@ -61,7 +64,9 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
         mPlace = getArguments().getParcelable(ARG_PLACE);
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(getString(R.string.direction_actiobar,mPlace.getName()));
@@ -77,6 +82,13 @@ public class DirectionFragment extends SupportMapFragment implements GoogleApiCl
             }
         });
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

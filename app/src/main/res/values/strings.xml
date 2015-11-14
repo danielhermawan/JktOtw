@@ -82,4 +82,8 @@
     <string name="title_activity_search">SearchActivity</string>
     <string name="no_location">No location provided</string>
     <string name="address_not_found">Address not found</string>
+    <string name="title_activity_photo">PhotoActivity</string>
+    <string name="add_photo">ADD PHOTO</string>
+    <string name="no_photo">There is no photo yet\nAdd it if you want</string>
+    <string name="all_place">All Place</string>
 </resources>

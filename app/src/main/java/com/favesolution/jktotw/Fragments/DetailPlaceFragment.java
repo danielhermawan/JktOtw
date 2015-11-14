@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.favesolution.jktotw.Activities.DirectionActivity;
 import com.favesolution.jktotw.Activities.ListPlacesActivity;
+import com.favesolution.jktotw.Activities.PhotoActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
@@ -59,6 +60,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
+import icepick.Icepick;
+import icepick.State;
 
 /**
  * Created by Daniel on 11/4/2015 for JktOtw project.
@@ -71,7 +74,7 @@ public class DetailPlaceFragment extends Fragment
     private static final String DIALOG_MESSAGE = "dialog_message";
     private static final int REQUEST_DIALOG_CONFIMATION = 1;
     private GoogleApiClient mGoogleApiClient;
-    private Place mPlace;
+    @State Place mPlace;
     private GoogleMap mMap;
     private String mPlaceId;
     @Bind(R.id.map_place) MapView mMapView;
@@ -94,6 +97,8 @@ public class DetailPlaceFragment extends Fragment
     @Bind(R.id.button_share) Button mButtonShare;
     @Bind(R.id.button_direction) Button mButtonDirection;
     @Bind(R.id.swipe_container) ScrollView mSwipeContainer;
+    @Bind(R.id.content_photo) View mContentPhoto;
+    @Bind(R.id.see_all_photo) TextView mTextAllPhoto;
     public static DetailPlaceFragment newInstance(Place place) {
         Bundle args = new Bundle();
         args.putParcelable(ARGS_PLACE,place);
@@ -104,6 +109,7 @@ public class DetailPlaceFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
         mPlace = getArguments().getParcelable(ARGS_PLACE);
@@ -113,7 +119,11 @@ public class DetailPlaceFragment extends Fragment
                 .addConnectionCallbacks(this)
                 .build();
     }
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_detail_place, container, false);
@@ -156,7 +166,19 @@ public class DetailPlaceFragment extends Fragment
         mButtonDirection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(DirectionActivity.newInstance(getActivity(),mPlace));
+                startActivity(DirectionActivity.newInstance(getActivity(), mPlace));
+            }
+        });
+        mContentPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(PhotoActivity.newIntent(getActivity(), mPlace));
+            }
+        });
+        mTextAllPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(PhotoActivity.newIntent(getActivity(), mPlace));
             }
         });
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
@@ -172,33 +194,50 @@ public class DetailPlaceFragment extends Fragment
                     updateMap();
             }
         });
-        final String url = UrlEndpoint.getDetailPlace(mPlace.getId());
-        Log.d("debug",url);
-        CustomJsonRequest placeDetailRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                //mSwipeContainer.setRefreshing(false);
-                showProgressBar(false);
-                try {
-                    JSONObject result = response.getJSONObject("result");
-                    mPlace = Place.fromJsonDetail(result,getActivity());
-                    updatePlace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+        if (isIndosat()) {
+            showProgressBar(false);
+            updatePlace();
+            final String url = UrlEndpoint.getHotspotPhoto(mPlace.getId());
+            CustomJsonRequest photoRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //mSwipeContainer.setRefreshing(false);
-                showProgressBar(false);
-                Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                Log.e("error",error.getMessage());
-            }
-        });
-        placeDetailRequest.setTag(this);
-        RequestQueueSingleton.getInstance(getActivity())
-                .addToRequestQueue(placeDetailRequest);
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error",error.getMessage());
+                }
+            });
+        } else {
+            final String url = UrlEndpoint.getDetailPlace(mPlace.getId());
+            CustomJsonRequest placeDetailRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //mSwipeContainer.setRefreshing(false);
+                    showProgressBar(false);
+                    try {
+                        JSONObject result = response.getJSONObject("result");
+                        mPlace = Place.fromJsonDetail(result,getActivity());
+                        updatePlace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //mSwipeContainer.setRefreshing(false);
+                    showProgressBar(false);
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error",error.getMessage());
+                }
+            });
+            placeDetailRequest.setTag(this);
+            RequestQueueSingleton.getInstance(getActivity())
+                    .addToRequestQueue(placeDetailRequest);
+        }
         return v;
     }
     @Override
@@ -250,6 +289,8 @@ public class DetailPlaceFragment extends Fragment
 
     @Override
     public void onConnected(Bundle bundle) {
+        if(isIndosat())
+            return;
         new PhotoTask(getResources().getDimension(R.dimen.image_photo_circle_width),getResources().getDimension(R.dimen.image_photo_circle_height),mGoogleApiClient,4)
                 .setOnResultCallback(new PhotoTask.FinishLoadingAction() {
                     @Override
@@ -282,7 +323,6 @@ public class DetailPlaceFragment extends Fragment
             }
         }
     }
-
     private void showProgressBar(boolean isShow) {
         if (isShow) {
             mProgressBar.setVisibility(View.VISIBLE);
@@ -324,5 +364,12 @@ public class DetailPlaceFragment extends Fragment
     private void setActionBarTitle(String title) {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         actionBar.setTitle(title);
+    }
+
+    private boolean isIndosat() {
+        if(mPlace.getType().getCategoryName().equals(getString(R.string.category_indosat)))
+            return true;
+        else
+            return false;
     }
 }

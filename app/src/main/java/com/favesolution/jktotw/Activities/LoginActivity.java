@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,6 +34,7 @@ import java.util.HashMap;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import icepick.Icepick;
+import icepick.State;
 
 public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.email_edit_login) EditText mEmailEditLogin;
@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.password_field_register) EditText mPasswordRegisterField;
     @Bind(R.id.repassword_field_register) EditText mRepasswordField;
     @Bind(R.id.button_register) Button mRegisterButton;
-    @PlaybackStateCompat.State private boolean mIsRegisterOpen;
+    @State boolean mIsRegisterOpen;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         mPasswordEditLogin.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == R.id.login || actionId == EditorInfo.IME_NULL) {
+                if (actionId == R.id.login_ime || actionId == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         mRepasswordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == R.id.login || actionId == EditorInfo.IME_NULL) {
+                if (actionId == R.id.register_ime || actionId == EditorInfo.IME_NULL) {
                     attemptRegister();
                     return true;
                 }

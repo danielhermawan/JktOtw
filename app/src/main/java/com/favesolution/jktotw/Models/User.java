@@ -1,5 +1,9 @@
 package com.favesolution.jktotw.Models;
 
+import android.content.Context;
+
+import com.favesolution.jktotw.Utils.SharedPreference;
+
 /**
  * Created by Daniel on 11/1/2015 for JktOtw project.
  */
@@ -40,5 +44,11 @@ public class User {
         mPhone = phone;
     }
 
+    public static boolean checkIsLogin(Context context) {
+        if (SharedPreference.getUserToken(context)!=null)
+            return true;
+        else
+            return false;
+    }
 
 }
