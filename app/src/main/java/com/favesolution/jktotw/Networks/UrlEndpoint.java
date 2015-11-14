@@ -61,6 +61,11 @@ public class UrlEndpoint {
                 .appendQueryParameter("location", stringLocation)
                 .toString();
     }
+    public static String loadMorePlace(String token) {
+        return URL_SEARCH_PLACE.buildUpon()
+                .appendQueryParameter("pagetoken",token)
+                .toString();
+    }
     public static String searchNearbyPlace(Location location, String type) {
         String stringLocation = location.getLatitude() + "," + location.getLongitude();
         return URL_SEARCH_PLACE.buildUpon()
