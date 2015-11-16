@@ -1,6 +1,5 @@
 package com.favesolution.jktotw.Activities;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -10,11 +9,8 @@ import android.support.v4.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -46,26 +42,35 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class SearchActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
-    @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
-    @Bind(R.id.progressBar) ProgressBar mProgressBar;
-    public static final String EXTRA_CATEGORY = "extra_category";
+public class RelatedPlaceActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
+    @Bind(R.id.recyclerview)
+    RecyclerView mRecyclerView;
+    @Bind(R.id.progressBar)
+    ProgressBar mProgressBar;
+    private Place mPlace;
     private ArrayList<Place> mPlaces = new ArrayList<>();
+    private SearchAdapter mAdapter;
+    private static final String EXTRA_PLACE = "extra_place";
+    private String mNextToken;
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
-    private String mQuery;
-    private String mFilter;
-    private String mNextToken = "";
-    private SearchAdapter mAdapter;
+    public static Intent newIntent(Place place, Context context) {
+        Intent i = new Intent(context, RelatedPlaceActivity.class);
+        i.putExtra(EXTRA_PLACE, place);
+        return i;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_related_place);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         UIHelper.showOverflowMenu(this);
+        mPlace = getIntent().getParcelableExtra(EXTRA_PLACE);
+        setTitle(getString(R.string.related_place_title,mPlace.getName()));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.ItemDecoration itemDecoration = new
@@ -80,53 +85,31 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                     public void run() {
                         loadMorePlace();
                     }
-                },1000);
+                }, 1000);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
         showProgressBar(true);
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            mQuery = intent.getStringExtra(SearchManager.QUERY);
-            mFilter = intent.getStringExtra(EXTRA_CATEGORY);
-        }
         mClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .build();
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
     @Override
     public void onStart() {
         super.onStart();
         mClient.connect();
     }
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            mQuery = intent.getStringExtra(SearchManager.QUERY);
-            doSearch();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_search, menu);
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.item_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);
-        searchView.setQuery(mQuery, false);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -135,26 +118,50 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                 .getRequestQueue()
                 .cancelAll(this);
     }
-    @Override
-    public void onConnected(Bundle bundle) {
-        LocationRequest request = LocationRequest.create();
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        request.setNumUpdates(1);
-        request.setInterval(0);
-        LocationServices.FusedLocationApi
-                .requestLocationUpdates(mClient, request, new LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        mCurrentLocation = location;
-                        doSearch();
+
+    private void loadPlace() {
+        if (isIndosat()) {
+
+        } else {
+            final String url = UrlEndpoint.searchNearbyPlace(mPlace.getLocation(), mPlace.getType().getCategoryFilter());
+            CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray result = response.getJSONArray("results");
+                        if (response.has("next_page_token")) {
+                            mNextToken = response.getString("next_page_token");
+                        }
+                        mPlaces = Place.fromJson(result, mCurrentLocation, RelatedPlaceActivity.this);
+                        RelatedPlaceActivity.this.startService(FetchAddressIntentService.newIntent(
+                                RelatedPlaceActivity.this,
+                                mPlaces,
+                                new ResultReceiver(new Handler()) {
+                                    @Override
+                                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+                                        mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
+                                        mAdapter.addItems(mPlaces);
+                                        showProgressBar(false);
+                                    }
+                                }
+                        ));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                });
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(RelatedPlaceActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error", error.getMessage());
+                }
+            });
+            relatedPlaceRequest.setTag(this);
+            RequestQueueSingleton.getInstance(this)
+                    .addToRequestQueue(relatedPlaceRequest);
+        }
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
     private void loadMorePlace() {
         if (!mNextToken.equals("")) {
             final String url = UrlEndpoint.loadMorePlace(mNextToken);
@@ -167,7 +174,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    mPlaces = Place.fromJson(result, mCurrentLocation,SearchActivity.this);
+                    mPlaces = Place.fromJson(result, mCurrentLocation,RelatedPlaceActivity.this);
                     if (response.has("next_page_token")) {
                         try {
                             mNextToken = response.getString("next_page_token");
@@ -178,8 +185,8 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                         mNextToken = "";
                         mAdapter.stopLoading();
                     }
-                    SearchActivity.this.startService(FetchAddressIntentService.newIntent(
-                            SearchActivity.this,
+                    RelatedPlaceActivity.this.startService(FetchAddressIntentService.newIntent(
+                            RelatedPlaceActivity.this,
                             mPlaces,
                             new ResultReceiver(new Handler()) {
                                 @Override
@@ -196,72 +203,50 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(SearchActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RelatedPlaceActivity.this, "Network error", Toast.LENGTH_SHORT).show();
                     Log.e("error", error.getMessage());
                 }
             });
             loadMoreRequest.setTag(this);
-            RequestQueueSingleton.getInstance(SearchActivity.this)
+            RequestQueueSingleton.getInstance(RelatedPlaceActivity.this)
                     .addToRequestQueue(loadMoreRequest);
         } else {
             mAdapter.stopLoading();
         }
     }
-    private void doSearch() {
-        if (mCurrentLocation == null) {
-            return;
-        }
-        RequestQueueSingleton.getInstance(this)
-                .getRequestQueue()
-                .cancelAll(this);
-        final String url;
-        if (mFilter == null || mFilter.equals("")) {
-            url = UrlEndpoint.searchNearbyPlaceByKeyword(this, mCurrentLocation, mQuery);
-        } else {
-            url = UrlEndpoint.searchNearbyPlaceByKeyword(this, mCurrentLocation, mQuery,mFilter);
-        }
-        CustomJsonRequest searchRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray result = response.getJSONArray("results");
-                    if (response.has("next_page_token")) {
-                        mNextToken = response.getString("next_page_token");
-                    }
-                    mPlaces = Place.fromJson(result, mCurrentLocation,SearchActivity.this);
-                    SearchActivity.this.startService(FetchAddressIntentService.newIntent(
-                            SearchActivity.this,
-                            mPlaces,
-                            new ResultReceiver(new Handler()){
-                                @Override
-                                protected void onReceiveResult(int resultCode, Bundle resultData) {
-                                    mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
-                                    mAdapter.addItems(mPlaces);
-                                    showProgressBar(false);
-                                }
-                            }
-                    ));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(SearchActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                Log.e("error", error.getMessage());
-            }
-        });
-        searchRequest.setTag(this);
-        RequestQueueSingleton.getInstance(this)
-                .addToRequestQueue(searchRequest);
-    }
 
     private void showProgressBar(boolean isShow) {
         if (isShow) {
             mProgressBar.setVisibility(View.VISIBLE);
-        } else{
+        } else {
             mProgressBar.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        LocationRequest request = LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setNumUpdates(1);
+        request.setInterval(0);
+        LocationServices.FusedLocationApi
+                .requestLocationUpdates(mClient, request, new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        mCurrentLocation = location;
+                        loadPlace();
+                    }
+                });
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+    private boolean isIndosat() {
+        if(mPlace.getType().getCategoryName().equals(getString(R.string.category_indosat)))
+            return true;
+        else
+            return false;
     }
 }

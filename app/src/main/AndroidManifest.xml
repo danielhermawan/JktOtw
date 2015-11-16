@@ -13,12 +13,16 @@
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" />
+    <uses-feature android:name="android.hardware.sensor.compass" />
 
     <application
         android:allowBackup="true"
@@ -108,6 +112,16 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.favesolution.jktotw.Activities.DetailPlaceActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.RelatedPlaceActivity"
+            android:label="@string/title_activity_related_place"
+            android:theme="@style/AppTheme" >
+        </activity>
+        <activity
+            android:name=".Activities.AugmentedActivity"
+            android:label="@string/title_activity_augmented"
+            android:theme="@style/AppTheme" >
         </activity>
     </application>
 

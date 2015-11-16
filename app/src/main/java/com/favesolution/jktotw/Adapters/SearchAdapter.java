@@ -10,10 +10,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.favesolution.jktotw.Activities.DetailPlaceActivity;
+import com.favesolution.jktotw.Interfaces.OnLoadMoreListener;
 import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.List;
 
@@ -23,31 +23,25 @@ import butterknife.ButterKnife;
 /**
  * Created by Daniel on 11/9/2015 for JktOtw project.
  */
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHolder>{
-    private List<Place> mPlaces;
-    private GoogleApiClient mClient;
-    public SearchAdapter(List<Place> places,GoogleApiClient client) {
-        mPlaces = places;
-        mClient = client;
+public class SearchAdapter extends RecyclerViewFooterAdapter<Place>{
+
+    public SearchAdapter(RecyclerView recyclerView, List<Place> dataSet, OnLoadMoreListener onLoadMoreListener) {
+        super(recyclerView, dataSet, onLoadMoreListener);
     }
 
+
     @Override
-    public SearchHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateBasicItemViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = inflater.inflate(R.layout.list_search_item,parent,false);
         return new SearchHolder(v,parent.getContext());
     }
 
     @Override
-    public void onBindViewHolder(SearchHolder holder, int position) {
-        Place place = mPlaces.get(position);
-        //Log.d("debug","Position = "+position+" "+place.getAddress());
-        holder.bindView(place,mClient);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mPlaces.size();
+    public void onBindBasicItemView(RecyclerView.ViewHolder genericHolder, int position) {
+        SearchHolder holder = (SearchHolder) genericHolder;
+        Place place = getItem(position);
+        holder.bindView(place);
     }
 
     class SearchHolder extends RecyclerView.ViewHolder
@@ -67,9 +61,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchHold
         public void onClick(View v) {
             mContext.startActivity(DetailPlaceActivity.newIntent(mContext,mPlace));
         }
-        public void bindView(Place place,GoogleApiClient client) {
+        public void bindView(Place place) {
             mPlace = place;
-            mClient = client;
             mTextName.setText(place.getName());
             mTextAddress.setText(place.getAddress());
             String url = UrlEndpoint.getPhotoUrl(mPlace.getPhotoRef(), 70, 70);

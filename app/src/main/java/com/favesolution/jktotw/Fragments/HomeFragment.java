@@ -3,6 +3,7 @@ package com.favesolution.jktotw.Fragments;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.favesolution.jktotw.Activities.AugmentedActivity;
 import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Activities.SearchActivity;
 import com.favesolution.jktotw.Models.Type;
@@ -28,6 +30,7 @@ import butterknife.ButterKnife;
 
 public class HomeFragment extends Fragment {
     @Bind(R.id.recyclerview) RecyclerView mRecyclerView;
+    @Bind(R.id.browse_frame) View mBrowse;
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         return fragment;
@@ -42,8 +45,8 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v =inflater.inflate(R.layout.fragment_home,container,false);
-        ButterKnife.bind(this,v);
+        View v =inflater.inflate(R.layout.fragment_home, container, false);
+        ButterKnife.bind(this, v);
         List<Type> types = Type.getCategory(getActivity());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(new CategoryAdapter(types));
@@ -51,6 +54,12 @@ public class HomeFragment extends Fragment {
         RecyclerView.ItemDecoration itemDecoration = new
                 DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST);
         mRecyclerView.addItemDecoration(itemDecoration);
+        mBrowse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), AugmentedActivity.class));
+            }
+        });
         return v;
     }
 

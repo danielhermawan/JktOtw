@@ -63,7 +63,7 @@
         ]]>
     </string>
     <string name="photos_number">Photos (%d)</string>
-    <string name="related_place_number">Related Places (%d)</string>
+    <string name="related_place_number">Related Places (%s)</string>
     <string name="reviews_number">Reviews (%d)</string>
     <string name="no_rating">No one rating it yet</string>
     <string name="text_review">%d reviews</string>
@@ -88,4 +88,7 @@
     <string name="all_place">All Place</string>
     <string name="loading_more_item">Loading more place</string>
     <string name="Reload_place">Reload More Place</string>
+    <string name="title_activity_related_place">RelatedPlaceActivity</string>
+    <string name="related_place_title">%s Related Places</string>
+    <string name="title_activity_augmented">Augmented Reality</string>
 </resources>

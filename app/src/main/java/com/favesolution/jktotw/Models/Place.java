@@ -34,7 +34,12 @@ public class Place implements Parcelable{
     private Type mType;
     public Place() {
     }
-
+    public Location getLocation() {
+        Location location = new Location("");
+        location.setLatitude(mLatitude);
+        location.setLongitude(mLongitude);
+        return location;
+    }
     public List<String> getPhotoRefs() {
         return mPhotoRefs;
     }
@@ -140,10 +145,15 @@ public class Place implements Parcelable{
             locationPlace.setLatitude(place.mLatitude);
             locationPlace.setLongitude(place.mLongitude);
             place.mDistance = userLocation.distanceTo(locationPlace);
+            place.setPhotoRefs(new ArrayList<String>());
             if (jsonObject.has("photos")) {
                 JSONArray photos = jsonObject.getJSONArray("photos");
                 JSONObject photo = photos.getJSONObject(0);
                 place.mPhotoRef = photo.getString("photo_reference");
+                for (int i = 0; i < photos.length(); i++) {
+                    JSONObject p = photos.getJSONObject(i);
+                    place.getPhotoRefs().add(p.getString("photo_reference"));
+                }
             }
             JSONArray types = jsonObject.getJSONArray("types");
             List<Type> typeList = Type.getCategory(context);

@@ -2,6 +2,7 @@ package com.favesolution.jktotw.Fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,9 +27,11 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
 import com.favesolution.jktotw.Activities.DirectionActivity;
 import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Activities.PhotoActivity;
+import com.favesolution.jktotw.Activities.RelatedPlaceActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
@@ -36,13 +39,14 @@ import com.favesolution.jktotw.Dialogs.DialogShare;
 import com.favesolution.jktotw.Models.Place;
 import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.Networks.CustomJsonRequest;
-import com.favesolution.jktotw.Networks.PhotoTask;
 import com.favesolution.jktotw.Networks.RequestQueueSingleton;
 import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
 import com.favesolution.jktotw.Utils.ImageHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -52,9 +56,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -77,6 +83,7 @@ public class DetailPlaceFragment extends Fragment
     @State Place mPlace;
     private GoogleMap mMap;
     private String mPlaceId;
+    private List<Place> mRelatedPlaces = new ArrayList<>();
     @Bind(R.id.map_place) MapView mMapView;
     @Bind(R.id.text_search_nearby) TextView mTextSearchNearby;
     @Bind(R.id.text_name_place) TextView mTextNamePlace;
@@ -92,16 +99,19 @@ public class DetailPlaceFragment extends Fragment
     @Bind(R.id.text_related_place_number) TextView mTextRelatedPlaceNumber;
     @Bind(R.id.text_review) TextView mTextReview;
     @Bind(R.id.recyclerview_photo) RecyclerView mPhotoRecyclerView;
+    @Bind(R.id.recyclerview_related_place) RecyclerView mRelatedRecyclerView;
     @Bind(R.id.progressBar) ProgressBar mProgressBar;
     @Bind(R.id.button_call) Button mButtonCall;
     @Bind(R.id.button_share) Button mButtonShare;
     @Bind(R.id.button_direction) Button mButtonDirection;
     @Bind(R.id.swipe_container) ScrollView mSwipeContainer;
     @Bind(R.id.content_photo) View mContentPhoto;
+    @Bind(R.id.content_related) View mContentRelated;
     @Bind(R.id.see_all_photo) TextView mTextAllPhoto;
+    @Bind(R.id.see_all_related_place) TextView mTextAllRelated;
     public static DetailPlaceFragment newInstance(Place place) {
         Bundle args = new Bundle();
-        args.putParcelable(ARGS_PLACE,place);
+        args.putParcelable(ARGS_PLACE, place);
         DetailPlaceFragment fragment = new DetailPlaceFragment();
         fragment.setArguments(args);
         return fragment;
@@ -115,7 +125,7 @@ public class DetailPlaceFragment extends Fragment
         mPlace = getArguments().getParcelable(ARGS_PLACE);
         mPlaceId = mPlace.getId();
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addApi(Places.GEO_DATA_API)
+                .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .build();
     }
@@ -159,7 +169,7 @@ public class DetailPlaceFragment extends Fragment
                 Uri uriImage = ImageHelper.getLocalBitmapUri(mImagePlace);
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 DialogShare dialog = DialogShare
-                        .newInstance(getString(R.string.share_place,mPlace.getName()),uriImage);
+                        .newInstance(getString(R.string.share_place, mPlace.getName()), uriImage);
                 dialog.show(fm, DIALOG_CONFIMATION);
             }
         });
@@ -181,7 +191,20 @@ public class DetailPlaceFragment extends Fragment
                 startActivity(PhotoActivity.newIntent(getActivity(), mPlace));
             }
         });
+        mTextAllRelated.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(RelatedPlaceActivity.newIntent(mPlace,getActivity()));
+            }
+        });
+        mContentRelated.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(RelatedPlaceActivity.newIntent(mPlace,getActivity()));
+            }
+        });
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
+        mRelatedRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),4));
         mMapView.onCreate(savedInstanceState);
         MapsInitializer.initialize(getActivity());
         mMapView.setClickable(false);
@@ -198,10 +221,28 @@ public class DetailPlaceFragment extends Fragment
             showProgressBar(false);
             updatePlace();
             final String url = UrlEndpoint.getHotspotPhoto(mPlace.getId());
+            Log.d(TAG, url);
             CustomJsonRequest photoRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-
+                    try {
+                        JSONArray results = response.getJSONArray("results");
+                        List<String> photoref = new ArrayList<>();
+                        for (int i = 0; i < results.length(); i++) {
+                            photoref.add(results.getJSONObject(i).getString("link").replace("\\/", "/"));
+                        }
+                        mPlace.setPhotoRefs(photoref);
+                        mPhotoRecyclerView.setAdapter(new PhotoAdapter(mPlace.getPhotoRefs()));
+                        if (photoref.size() != 0) {
+                            Glide.with(getActivity())
+                                    .load(photoref.get(0))
+                                    .error(R.drawable.bitmap_placeholder)
+                                    .into(mImagePlace);
+                        }
+                        updatePhoto();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -210,6 +251,9 @@ public class DetailPlaceFragment extends Fragment
                     Log.e("error",error.getMessage());
                 }
             });
+            photoRequest.setTag(this);
+            RequestQueueSingleton.getInstance(getActivity())
+                    .addToRequestQueue(photoRequest);
         } else {
             final String url = UrlEndpoint.getDetailPlace(mPlace.getId());
             CustomJsonRequest placeDetailRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
@@ -220,6 +264,8 @@ public class DetailPlaceFragment extends Fragment
                     try {
                         JSONObject result = response.getJSONObject("result");
                         mPlace = Place.fromJsonDetail(result,getActivity());
+                        mPhotoRecyclerView.setAdapter(new PhotoAdapter(mPlace.getPhotoRefs()));
+                        updatePhoto();
                         updatePlace();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -237,6 +283,7 @@ public class DetailPlaceFragment extends Fragment
             placeDetailRequest.setTag(this);
             RequestQueueSingleton.getInstance(getActivity())
                     .addToRequestQueue(placeDetailRequest);
+
         }
         return v;
     }
@@ -289,22 +336,73 @@ public class DetailPlaceFragment extends Fragment
 
     @Override
     public void onConnected(Bundle bundle) {
-        if(isIndosat())
-            return;
-        new PhotoTask(getResources().getDimension(R.dimen.image_photo_circle_width),getResources().getDimension(R.dimen.image_photo_circle_height),mGoogleApiClient,4)
-                .setOnResultCallback(new PhotoTask.FinishLoadingAction() {
+        LocationRequest request = LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setNumUpdates(1);
+        request.setInterval(0);
+        LocationServices.FusedLocationApi
+                .requestLocationUpdates(mGoogleApiClient, request, new LocationListener() {
                     @Override
-                    public void onResult(List<PhotoTask.AttributedPhoto> attributedPhotos) {
-                        if (attributedPhotos != null && attributedPhotos.size()!=0) {
-                            PhotoTask.AttributedPhoto firstPhoto = attributedPhotos.get(0);
-                            mImagePlace.setImageBitmap(firstPhoto.bitmap);
-                            mTextCountPhoto.setText(firstPhoto.totalPhoto + "");
-                            mTextPhoto.setText(getString(R.string.photos_number, firstPhoto.totalPhoto));
-                            mPhotoRecyclerView.setAdapter(new PhotoAdapter(attributedPhotos));
+                    public void onLocationChanged(final Location location) {
+                        if (isIndosat()) {
+                            final String url = UrlEndpoint.getHotspot();
+                            CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    JSONArray result = null;
+                                    try {
+                                        result = response.getJSONArray("results");
+                                        mRelatedPlaces = Place.fromJsonHotspot(result, location, getActivity());
+                                        updatePlace();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                                    Log.e("error", error.getMessage());
+                                }
+                            });
+                        } else {
+                            final String url = UrlEndpoint.searchNearbyPlace(mPlace.getLocation(), mPlace.getType().getCategoryFilter());
+                            CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    try {
+                                        JSONArray result = response.getJSONArray("results");
+                                        mRelatedPlaces = Place.fromJson(result, location, getActivity());
+                                        updateRelatedPlace();
+                                        List<String> photoRefs = new ArrayList<String>();
+                                        for (int i = 0; i < 4; i++) {
+                                            if (mRelatedPlaces.get(i).getPhotoRef() != null) {
+                                                photoRefs.add(mRelatedPlaces.get(i).getPhotoRef());
+                                            } else {
+                                                photoRefs.add("error");
+                                            }
+                                        }
+                                        mRelatedRecyclerView.setAdapter(new PhotoAdapter(photoRefs));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                                    Log.e("error", error.getMessage());
+                                }
+                            });
+                            relatedPlaceRequest.setTag(this);
+                            RequestQueueSingleton.getInstance(getActivity())
+                                    .addToRequestQueue(relatedPlaceRequest);
+
+
                         }
                     }
-                })
-        .execute(mPlaceId);
+                });
     }
 
     @Override
@@ -321,6 +419,19 @@ public class DetailPlaceFragment extends Fragment
                 callIntent.setData(Uri.parse("tel:" + mPlace.getPhoneNumber()));
                 startActivity(callIntent);
             }
+        }
+    }
+    private void updatePhoto() {
+        mTextCountPhoto.setText(mPlace.getPhotoRefs().size()+"");
+        mTextPhoto.setText(getString(R.string.photos_number, mPlace.getPhotoRefs().size()));
+    }
+    private void updateRelatedPlace() {
+        if (mRelatedPlaces.size() >= 20) {
+            mTextRelatedPlaceNumber.setText(getString(R.string.related_place_number, "20+"));
+            mTextCountPlace.setText("20+");
+        } else {
+            mTextRelatedPlaceNumber.setText(getString(R.string.related_place_number, mRelatedPlaces.size() + ""));
+            mTextCountPhoto.setText(mRelatedPlaces.size() + "");
         }
     }
     private void showProgressBar(boolean isShow) {
