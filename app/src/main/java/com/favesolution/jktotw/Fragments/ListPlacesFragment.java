@@ -287,7 +287,7 @@ public class ListPlacesFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                        Log.e("error", error.getMessage());
+                        Log.e("error", error.toString());
                         mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });

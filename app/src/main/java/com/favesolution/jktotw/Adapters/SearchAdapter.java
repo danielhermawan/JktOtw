@@ -1,6 +1,7 @@
 package com.favesolution.jktotw.Adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,7 @@ public class SearchAdapter extends RecyclerViewFooterAdapter<Place>{
             implements View.OnClickListener {
         @Bind(R.id.image_place) ImageView mImageView;
         @Bind(R.id.text_name_place) TextView mTextName;
-        @Bind(R.id.text_address_place) TextView mTextAddress;
+        //@Bind(R.id.text_address_place) TextView mTextAddress;
         private Place mPlace;
         private Context mContext;
         public SearchHolder(View itemView,Context context) {
@@ -64,12 +65,23 @@ public class SearchAdapter extends RecyclerViewFooterAdapter<Place>{
         public void bindView(Place place) {
             mPlace = place;
             mTextName.setText(place.getName());
-            mTextAddress.setText(place.getAddress());
-            String url = UrlEndpoint.getPhotoUrl(mPlace.getPhotoRef(), 70, 70);
-            Glide.with(mContext)
-                    .load(url)
-                    .error(R.drawable.bitmap_placeholder)
-                    .into(mImageView);
+            //mTextAddress.setText(place.getAddress());
+            String url;
+            if (mPlace.getPhotoRef() != null) {
+                if (mPlace.getPhotoRef().startsWith("http://favesolution.com/jktotw/")) {
+                    url = mPlace.getPhotoRef();
+                } else {
+                    url = UrlEndpoint.getPhotoUrl(mPlace.getPhotoRef(), 70, 70);
+                }
+                Glide.with(mContext)
+                        .load(url)
+                        //.placeholder(R.drawable.bitmap_default_placeholder_300x300)
+                        .error(R.drawable.bitmap_placeholder)
+                        .into(mImageView);
+            } else {
+                mImageView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.bitmap_placeholder));
+            }
+
         }
     }
 }

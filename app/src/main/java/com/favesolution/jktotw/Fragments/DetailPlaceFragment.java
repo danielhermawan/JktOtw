@@ -2,6 +2,7 @@ package com.favesolution.jktotw.Fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
@@ -28,20 +30,26 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.favesolution.jktotw.Activities.DirectionActivity;
 import com.favesolution.jktotw.Activities.ListPlacesActivity;
 import com.favesolution.jktotw.Activities.PhotoActivity;
 import com.favesolution.jktotw.Activities.RelatedPlaceActivity;
+import com.favesolution.jktotw.Activities.ReviewActivity;
 import com.favesolution.jktotw.Adapters.PhotoAdapter;
+import com.favesolution.jktotw.Adapters.ReviewAdapter;
 import com.favesolution.jktotw.Dialogs.DialogConfirmation;
 import com.favesolution.jktotw.Dialogs.DialogMessage;
 import com.favesolution.jktotw.Dialogs.DialogShare;
 import com.favesolution.jktotw.Models.Place;
+import com.favesolution.jktotw.Models.Review;
 import com.favesolution.jktotw.Models.Type;
 import com.favesolution.jktotw.Networks.CustomJsonRequest;
 import com.favesolution.jktotw.Networks.RequestQueueSingleton;
 import com.favesolution.jktotw.Networks.UrlEndpoint;
 import com.favesolution.jktotw.R;
+import com.favesolution.jktotw.Utils.DividerItemDecoration;
 import com.favesolution.jktotw.Utils.ImageHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -82,8 +90,9 @@ public class DetailPlaceFragment extends Fragment
     private GoogleApiClient mGoogleApiClient;
     @State Place mPlace;
     private GoogleMap mMap;
-    private String mPlaceId;
+    private Location mCurrentLocation;
     private List<Place> mRelatedPlaces = new ArrayList<>();
+    private Bitmap mShareBitmap;
     @Bind(R.id.map_place) MapView mMapView;
     @Bind(R.id.text_search_nearby) TextView mTextSearchNearby;
     @Bind(R.id.text_name_place) TextView mTextNamePlace;
@@ -100,6 +109,7 @@ public class DetailPlaceFragment extends Fragment
     @Bind(R.id.text_review) TextView mTextReview;
     @Bind(R.id.recyclerview_photo) RecyclerView mPhotoRecyclerView;
     @Bind(R.id.recyclerview_related_place) RecyclerView mRelatedRecyclerView;
+    @Bind(R.id.recyclerview_review) RecyclerView mReviewRecyclerView;
     @Bind(R.id.progressBar) ProgressBar mProgressBar;
     @Bind(R.id.button_call) Button mButtonCall;
     @Bind(R.id.button_share) Button mButtonShare;
@@ -109,6 +119,8 @@ public class DetailPlaceFragment extends Fragment
     @Bind(R.id.content_related) View mContentRelated;
     @Bind(R.id.see_all_photo) TextView mTextAllPhoto;
     @Bind(R.id.see_all_related_place) TextView mTextAllRelated;
+    @Bind(R.id.see_all_review) TextView mTextAllReview;
+    @Bind(R.id.content_review) View mContentReview;
     public static DetailPlaceFragment newInstance(Place place) {
         Bundle args = new Bundle();
         args.putParcelable(ARGS_PLACE, place);
@@ -123,7 +135,6 @@ public class DetailPlaceFragment extends Fragment
         setRetainInstance(true);
         setHasOptionsMenu(true);
         mPlace = getArguments().getParcelable(ARGS_PLACE);
-        mPlaceId = mPlace.getId();
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -166,11 +177,19 @@ public class DetailPlaceFragment extends Fragment
         mButtonShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uriImage = ImageHelper.getLocalBitmapUri(mImagePlace);
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                DialogShare dialog = DialogShare
-                        .newInstance(getString(R.string.share_place, mPlace.getName()), uriImage);
-                dialog.show(fm, DIALOG_CONFIMATION);
+                if (mShareBitmap != null) {
+                    Uri uriImage = ImageHelper.getLocalBitmapUri(mImagePlace);
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    DialogShare dialog = DialogShare
+                            .newInstance(getString(R.string.share_place, mPlace.getName()), uriImage);
+                    dialog.show(fm, DIALOG_CONFIMATION);
+                } else {
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    DialogShare dialog = DialogShare
+                            .newInstance(getString(R.string.share_place, mPlace.getName()));
+                    dialog.show(fm, DIALOG_CONFIMATION);
+                }
+
             }
         });
         mButtonDirection.setOnClickListener(new View.OnClickListener() {
@@ -203,8 +222,21 @@ public class DetailPlaceFragment extends Fragment
                 startActivity(RelatedPlaceActivity.newIntent(mPlace,getActivity()));
             }
         });
+        mTextAllReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ReviewActivity.newIntent(getActivity(), mPlace));
+            }
+        });
+        mContentReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ReviewActivity.newIntent(getActivity(), mPlace));
+            }
+        });
         mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
         mRelatedRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),4));
+        mReviewRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mMapView.onCreate(savedInstanceState);
         MapsInitializer.initialize(getActivity());
         mMapView.setClickable(false);
@@ -233,13 +265,22 @@ public class DetailPlaceFragment extends Fragment
                         }
                         mPlace.setPhotoRefs(photoref);
                         mPhotoRecyclerView.setAdapter(new PhotoAdapter(mPlace.getPhotoRefs()));
-                        if (photoref.size() != 0) {
-                            Glide.with(getActivity())
-                                    .load(photoref.get(0))
-                                    .error(R.drawable.bitmap_placeholder)
-                                    .into(mImagePlace);
-                        }
                         updatePhoto();
+                        updateRelatedPlaceIndosat();
+                        if (mPlace.getPhotoRefs().size() != 0) {
+                            Glide.with(getActivity())
+                                    .load(mPlace.getPhotoRefs().get(mPlace.getPhotoRefs().size() - 1))
+                                    .asBitmap()
+                                    .placeholder(R.drawable.bitmap_default_placeholder_300x300)
+                                    .error(R.drawable.bitmap_placeholder)
+                                    .into(new BitmapImageViewTarget(mImagePlace){
+                                        @Override
+                                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                            super.onResourceReady(resource, glideAnimation);
+                                            mShareBitmap = resource;
+                                        }
+                                    });
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -254,19 +295,14 @@ public class DetailPlaceFragment extends Fragment
             photoRequest.setTag(this);
             RequestQueueSingleton.getInstance(getActivity())
                     .addToRequestQueue(photoRequest);
-        } else {
-            final String url = UrlEndpoint.getDetailPlace(mPlace.getId());
-            CustomJsonRequest placeDetailRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+            final String reviewUrl = UrlEndpoint.getReviewByHospot(mPlace.getId());
+            CustomJsonRequest reviewRequest= new CustomJsonRequest(reviewUrl, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    //mSwipeContainer.setRefreshing(false);
-                    showProgressBar(false);
                     try {
-                        JSONObject result = response.getJSONObject("result");
-                        mPlace = Place.fromJsonDetail(result,getActivity());
-                        mPhotoRecyclerView.setAdapter(new PhotoAdapter(mPlace.getPhotoRefs()));
-                        updatePhoto();
-                        updatePlace();
+                        JSONArray results = response.getJSONArray("results");
+                        mPlace.setReviews(Review.fromJsonJktOtw(results));
+                        updateReviewUi();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -274,16 +310,135 @@ public class DetailPlaceFragment extends Fragment
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error",error.getMessage());
+                }
+            });
+            reviewRequest.setTag(this);
+            RequestQueueSingleton.getInstance(getActivity())
+                    .addToRequestQueue(reviewRequest);
+        } else {
+            final String url = UrlEndpoint.getDetailPlace(mPlace.getId());
+            CustomJsonRequest placeDetailRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        //Bagian foto
+                        JSONObject result = response.getJSONObject("result");
+                        mPlace = Place.fromJsonDetail(result,getActivity());
+                        mPhotoRecyclerView.setAdapter(new PhotoAdapter(mPlace.getPhotoRefs()));
+                        updatePhoto();
+                        updatePlace();
+                        if (mPlace.getPhotoRefs().size() != 0) {
+                            Glide.with(getActivity())
+                                    .load(UrlEndpoint.getPhotoUrl(mPlace.getPhotoRefs().get(mPlace.getPhotoRefs().size() - 1),
+                                            (int) getActivity().getResources().getDimension(R.dimen.image_photo_circle_width),
+                                            (int) getActivity().getResources().getDimension(R.dimen.image_photo_circle_height)))
+                                    .asBitmap()
+                                    .placeholder(R.drawable.bitmap_default_placeholder_300x300)
+                                    .error(R.drawable.bitmap_placeholder)
+                                    .into(new BitmapImageViewTarget(mImagePlace){
+                                        @Override
+                                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                            super.onResourceReady(resource, glideAnimation);
+                                            mShareBitmap = resource;
+                                        }
+                                    });
+                        }
+                        final String photoUrl = UrlEndpoint.getPlacePhoto(mPlace.getId());
+                        CustomJsonRequest photoRequest = new CustomJsonRequest(photoUrl, null, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    JSONArray results = response.getJSONArray("results");
+                                    List<String> photoref = new ArrayList<>();
+                                    for (int i = 0; i < results.length(); i++) {
+                                        photoref.add(results.getJSONObject(i).getString("link").replace("\\/", "/"));
+                                    }
+                                    if (mPlace.getPhotoRefs().size() == 0 && photoref.size()!=0) {
+                                        mPlace.getPhotoRefs().addAll(photoref);
+                                        Glide.with(getActivity())
+                                                .load(UrlEndpoint.getPhotoUrl(mPlace.getPhotoRefs().get(mPlace.getPhotoRefs().size() - 1),
+                                                        (int) getActivity().getResources().getDimension(R.dimen.image_photo_circle_width),
+                                                        (int) getActivity().getResources().getDimension(R.dimen.image_photo_circle_height)))
+                                                .asBitmap()
+                                                .placeholder(R.drawable.bitmap_default_placeholder_300x300)
+                                                .error(R.drawable.bitmap_placeholder)
+                                                .into(new BitmapImageViewTarget(mImagePlace) {
+                                                    @Override
+                                                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                                        super.onResourceReady(resource, glideAnimation);
+                                                        mShareBitmap = resource;
+                                                    }
+                                                });
+                                    } else {
+                                        mPlace.getPhotoRefs().addAll(photoref);
+                                    }
+                                    updatePhoto();
+                                    updatePlace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                                Log.e("error",error.toString());
+                            }
+                        });
+                        photoRequest.setTag(this);
+                        RequestQueueSingleton.getInstance(getActivity())
+                                .addToRequestQueue(photoRequest);
+
+                        //bagian review
+                        List<Review> reviews = new ArrayList<>();
+                        if (result.has("reviews")) {
+                            JSONArray reviewsJson = result.getJSONArray("reviews");
+                            reviews = Review.fromJson(reviewsJson);
+                        }
+                        mPlace.setReviews(reviews);
+                        updateReviewUi();
+                        final String reviewUrl = UrlEndpoint.getReviewByPlace(mPlace.getId());
+                        CustomJsonRequest reviewRequest= new CustomJsonRequest(reviewUrl, null, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    JSONArray results = response.getJSONArray("results");
+                                    mPlace.getReviews().addAll(Review.fromJsonJktOtw(results));
+                                    updateReviewUi();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                                //Log.e("error",error.getMessage());
+                            }
+                        });
+                        reviewRequest.setTag(this);
+                        RequestQueueSingleton.getInstance(getActivity())
+                                .addToRequestQueue(reviewRequest);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    showProgressBar(false);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
                     //mSwipeContainer.setRefreshing(false);
                     showProgressBar(false);
                     Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                    Log.e("error",error.getMessage());
+                    Log.e("error",error.toString());
                 }
             });
             placeDetailRequest.setTag(this);
             RequestQueueSingleton.getInstance(getActivity())
                     .addToRequestQueue(placeDetailRequest);
-
         }
         return v;
     }
@@ -344,27 +499,9 @@ public class DetailPlaceFragment extends Fragment
                 .requestLocationUpdates(mGoogleApiClient, request, new LocationListener() {
                     @Override
                     public void onLocationChanged(final Location location) {
+                        mCurrentLocation = location;
                         if (isIndosat()) {
-                            final String url = UrlEndpoint.getHotspot();
-                            CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    JSONArray result = null;
-                                    try {
-                                        result = response.getJSONArray("results");
-                                        mRelatedPlaces = Place.fromJsonHotspot(result, location, getActivity());
-                                        updatePlace();
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                                    Log.e("error", error.getMessage());
-                                }
-                            });
+                            updateRelatedPlaceIndosat();
                         } else {
                             final String url = UrlEndpoint.searchNearbyPlace(mPlace.getLocation(), mPlace.getType().getCategoryFilter());
                             CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
@@ -373,9 +510,9 @@ public class DetailPlaceFragment extends Fragment
                                     try {
                                         JSONArray result = response.getJSONArray("results");
                                         mRelatedPlaces = Place.fromJson(result, location, getActivity());
-                                        updateRelatedPlace();
+                                        updateRelatedPlaceUi();
                                         List<String> photoRefs = new ArrayList<String>();
-                                        for (int i = 0; i < 4; i++) {
+                                        for (int i = 0; i < (mRelatedPlaces.size() > 4 ? 4 : mRelatedPlaces.size()); i++) {
                                             if (mRelatedPlaces.get(i).getPhotoRef() != null) {
                                                 photoRefs.add(mRelatedPlaces.get(i).getPhotoRef());
                                             } else {
@@ -383,6 +520,9 @@ public class DetailPlaceFragment extends Fragment
                                             }
                                         }
                                         mRelatedRecyclerView.setAdapter(new PhotoAdapter(photoRefs));
+                                        if (photoRefs.size() == 0) {
+                                            mRelatedRecyclerView.setVisibility(View.GONE);
+                                        }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -392,7 +532,7 @@ public class DetailPlaceFragment extends Fragment
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
                                     Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                                    Log.e("error", error.getMessage());
+                                    Log.e("error", error.toString());
                                 }
                             });
                             relatedPlaceRequest.setTag(this);
@@ -421,17 +561,71 @@ public class DetailPlaceFragment extends Fragment
             }
         }
     }
+    private void updateReviewUi() {
+        mReviewRecyclerView.setAdapter(new ReviewAdapter(mPlace.getReviews(), 2));
+        RecyclerView.ItemDecoration itemDecoration = new
+                DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST);
+        mReviewRecyclerView.addItemDecoration(itemDecoration);
+        mTextReview.setText(getString(R.string.text_review,mPlace.getReviews().size()));
+        mTextCountReview.setText(mPlace.getReviews().size()+"");
+        mTextReviewNumber.setText(getString(R.string.reviews_number,mPlace.getReviews().size()));
+        if (mPlace.getReviews().size() == 0) {
+            mReviewRecyclerView.setVisibility(View.GONE);
+        } else {
+            mReviewRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+    private void updateRelatedPlaceIndosat() {
+        if (mCurrentLocation != null && mPlace.getPhotoRefs() != null) {
+            final String url = UrlEndpoint.getHotspot();
+            CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    JSONArray result = null;
+                    try {
+                        result = response.getJSONArray("results");
+                        mRelatedPlaces = Place.fromJsonHotspot(result, mCurrentLocation, getActivity());
+                        updatePlace();
+                        updateRelatedPlaceUi();
+                        List<String> photoRefs = new ArrayList<>();
+                        for (int i = 0; i < (mRelatedPlaces.size()>4?4:mRelatedPlaces.size()); i++) {
+                            if (mRelatedPlaces.get(i).getPhotoRef() != null) {
+                                photoRefs.add(mRelatedPlaces.get(i).getPhotoRef());
+                            } else {
+                                photoRefs.add("error");
+                            }
+                        }
+                        mRelatedRecyclerView.setAdapter(new PhotoAdapter(photoRefs));
+                        if (mRelatedPlaces.size() == 0) {
+                            mRelatedRecyclerView.setVisibility(View.GONE);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error", error.getMessage());
+                }
+            });
+            relatedPlaceRequest.setTag(this);
+            RequestQueueSingleton.getInstance(getActivity())
+                    .addToRequestQueue(relatedPlaceRequest);
+        }
+    }
     private void updatePhoto() {
         mTextCountPhoto.setText(mPlace.getPhotoRefs().size()+"");
         mTextPhoto.setText(getString(R.string.photos_number, mPlace.getPhotoRefs().size()));
     }
-    private void updateRelatedPlace() {
+    private void updateRelatedPlaceUi() {
         if (mRelatedPlaces.size() >= 20) {
             mTextRelatedPlaceNumber.setText(getString(R.string.related_place_number, "20+"));
             mTextCountPlace.setText("20+");
         } else {
             mTextRelatedPlaceNumber.setText(getString(R.string.related_place_number, mRelatedPlaces.size() + ""));
-            mTextCountPhoto.setText(mRelatedPlaces.size() + "");
+            mTextCountPlace.setText(mRelatedPlaces.size() + "");
         }
     }
     private void showProgressBar(boolean isShow) {

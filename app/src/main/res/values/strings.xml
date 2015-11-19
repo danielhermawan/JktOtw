@@ -84,11 +84,23 @@
     <string name="address_not_found">Address not found</string>
     <string name="title_activity_photo">PhotoActivity</string>
     <string name="add_photo">ADD PHOTO</string>
-    <string name="no_photo">There is no photo yet\nAdd it if you want</string>
+    <string name="no_photo">There is no photo yet\nAdd it if you want by login</string>
     <string name="all_place">All Place</string>
     <string name="loading_more_item">Loading more place</string>
     <string name="Reload_place">Reload More Place</string>
     <string name="title_activity_related_place">RelatedPlaceActivity</string>
     <string name="related_place_title">%s Related Places</string>
     <string name="title_activity_augmented">Augmented Reality</string>
+    <string name="review">\"%s\"</string>
+    <string name="title_activity_review">Reviews</string>
+    <string name="add_review">Write a review...</string>
+    <string name="no_review">There is no review yet\nAdd it if you want</string>
+    <string name="title_activity_add_review">Add Review</string>
+    <string name="post">Post</string>
+    <string name="title_activity_help">Help</string>
+    <string name="question_review">What is reviews?</string>
+    <string name="question_related_place">What is related places?</string>
+    <string name="answer_review">You can find or add review for specific place</string>
+    <string name="answer_related_place">With related place you can find other place that near place you see with the same type</string>
+    <string name="more_detail">more details</string>
 </resources>

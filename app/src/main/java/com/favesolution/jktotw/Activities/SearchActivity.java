@@ -229,18 +229,19 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                         mNextToken = response.getString("next_page_token");
                     }
                     mPlaces = Place.fromJson(result, mCurrentLocation,SearchActivity.this);
-                    SearchActivity.this.startService(FetchAddressIntentService.newIntent(
+                    mAdapter.addItems(mPlaces);
+                    showProgressBar(false);
+                    /*SearchActivity.this.startService(FetchAddressIntentService.newIntent(
                             SearchActivity.this,
                             mPlaces,
                             new ResultReceiver(new Handler()){
                                 @Override
                                 protected void onReceiveResult(int resultCode, Bundle resultData) {
                                     mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
-                                    mAdapter.addItems(mPlaces);
-                                    showProgressBar(false);
+
                                 }
                             }
-                    ));
+                    ));*/
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -249,7 +250,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(SearchActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                Log.e("error", error.getMessage());
+                Log.e("error", error.toString());
             }
         });
         searchRequest.setTag(this);

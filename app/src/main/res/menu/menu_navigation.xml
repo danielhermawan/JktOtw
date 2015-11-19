@@ -11,10 +11,10 @@
             android:title="@string/navigation_item_login"
             android:checkable="false"
             android:icon="@drawable/ic_lock_outline_white_24dp"/>
-        <item
+        <!--<item
             android:id="@+id/navigation_item_profile"
             android:title="@string/navigation_item_profile"
-            android:icon="@drawable/ic_account_circle_white_24dp"/>
+            android:icon="@drawable/ic_account_circle_white_24dp"/>-->
         <!--<item
             android:id="@+id/navigation_item_search"
             android:title="@string/navigation_item_search"

@@ -154,6 +154,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                     public void onLocationChanged(Location location) {
                         if (mCurrentLocation == null) {
                             mCurrentLocation = location;
+                            Toast.makeText(getActivity(),"Fetch place data from server",Toast.LENGTH_SHORT).show();
                             refreshPlace();
                         } else {
                             mCurrentLocation = location;
@@ -194,6 +195,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                     try {
                         JSONArray result = response.getJSONArray("results");
                         mPlaces.addAll(Place.fromJson(result, mCurrentLocation, getActivity()));
+                        Toast.makeText(getActivity(),"Load more places successfully",Toast.LENGTH_SHORT).show();
                         if (response.has("next_page_token")) {
                             mNextToken = response.getString("next_page_token");
                         } else {
@@ -209,12 +211,14 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Toast.makeText(getActivity(), "Network error", Toast.LENGTH_SHORT).show();
-                    Log.e("error", error.getMessage());
+                    Log.e("error", error.toString());
                 }
             });
             placeRequest.setTag(this);
             RequestQueueSingleton.getInstance(getActivity())
                     .addToRequestQueue(placeRequest);
+        }else {
+            Toast.makeText(getActivity(), "Cannot load more places", Toast.LENGTH_SHORT).show();
         }
     }
     private void refreshPlace() {
@@ -230,6 +234,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                     try {
                         JSONArray result = response.getJSONArray("results");
                         mPlaces = Place.fromJsonHotspot(result,mCurrentLocation,getActivity());
+                        Toast.makeText(getActivity(),"Data places successfully fetched",Toast.LENGTH_SHORT).show();
                         updateMap();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -250,6 +255,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
                     try {
                         JSONArray result = response.getJSONArray("results");
                         mPlaces.addAll(Place.fromJson(result, mCurrentLocation, getActivity()));
+                        Toast.makeText(getActivity(),"Data places successfully fetched",Toast.LENGTH_SHORT).show();
                         if (response.has("next_page_token")) {
                             mNextToken = response.getString("next_page_token");
                         }

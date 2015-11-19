@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_add_review"
+    tools:context="com.favesolution.jktotw.Activities.AddReviewActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText
+        android:id="@+id/edit_review"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top|left"
+        android:padding="@dimen/activity_horizontal_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:showIn="@layout/activity_add_review"
+        tools:context="com.favesolution.jktotw.Activities.AddReviewActivity"
+        android:hint="@string/add_review"
+        android:inputType="textMultiLine|textCapSentences"
+        android:background="@color/colorWhite"
+        android:imeOptions="actionSend">
+    </EditText>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimary"
+        android:padding="@dimen/activity_horizontal_margin">
+        <TextView
+            android:layout_gravity="right"
+            android:text="0"
+            android:textSize="15sp"
+            android:id="@+id/text_count_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorWhite"/>
+    </FrameLayout>
+</FrameLayout>

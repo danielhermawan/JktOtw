@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.favesolution.jktotw.Activities.AugmentedActivity">
+    tools:context="com.favesolution.jktotw.Activities.ReviewActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_height="wrap_content"
@@ -21,26 +21,11 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
+
     <FrameLayout
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <fragment
-            android:id="@+id/beyondar_fragment"
-            android:name="com.beyondar.android.fragment.BeyondarFragmentSupport"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|top"
-            android:background="@drawable/radar_bg_small" >
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-            <com.beyondar.android.plugin.radar.RadarView
-                android:id="@+id/radarView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/radar_north_small" />
-        </FrameLayout>
-    </FrameLayout>
 </android.support.design.widget.CoordinatorLayout>

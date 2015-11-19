@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.navigation_item_hotspot:
                         startActivity(ListPlacesActivity.newIntent(MainActivity.this, types.get(6)));
                         return true;
-                    case R.id.navigation_item_profile:
-                        return true;
+                    /*case R.id.navigation_item_profile:
+                        return true;*/
                     case R.id.navigation_item_logout:
                         SharedPreference.setUserToken(MainActivity.this, null);
                         //TODO: Erase token from database server
@@ -100,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
                         type.setCategoryName(getString(R.string.all_place));
                         type.setCategoryFilter("all");
                         startActivity(MapPlaceActivity.newIntent(MainActivity.this,type));
+                        return true;
+                    case R.id.navigation_item_help:
+                        Intent helpIntent = new Intent(MainActivity.this,HelpActivity.class);
+                        startActivity(helpIntent);
                         return true;
                     default:
                         return true;
@@ -142,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkNavigationMenu() {
         Menu menu = mNavigationView.getMenu();
         if (SharedPreference.getUserToken(this) == null) {
-            menu.findItem(R.id.navigation_item_profile).setVisible(false);
+            //menu.findItem(R.id.navigation_item_profile).setVisible(false);
             menu.findItem(R.id.navigation_item_logout).setVisible(false);
         } else {
             menu.findItem(R.id.navigation_item_login).setVisible(false);

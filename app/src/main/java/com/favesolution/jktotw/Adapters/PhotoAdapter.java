@@ -69,6 +69,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoHolder>
                 }
                 Glide.with(mContext)
                         .load(url)
+                        //.placeholder(R.drawable.bitmap_default_placeholder_300x300)
                         .error(R.drawable.bitmap_placeholder)
                         .into(mImageView);
             } else {

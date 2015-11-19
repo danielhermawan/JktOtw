@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="400dp"
+    android:layout_height="150dp"
+    android:background="@drawable/shape_geoview"
+    android:padding="6dp">
+    <TextView
+        android:text="Siloam Hospital"
+        android:id="@+id/place_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/colorWhite"/>
+    <TextView
+        android:drawableLeft="@drawable/ic_place_grey_700_24dp"
+        android:textSize="12sp"
+        android:text="10km"
+        android:id="@+id/place_distance"
+        android:textColor="@color/colorWhite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+    <ImageView
+        android:id="@+id/marker_icon"
+        android:src="@drawable/bitmap_marker_hospital"
+        android:scaleType="centerCrop"
+        android:layout_alignParentRight="true"
+        android:layout_width="20dp"
+        android:layout_height="20dp"/>
+    <TextView
+        android:text="@string/more_detail"
+        android:textSize="12sp"
+        android:layout_alignParentBottom="true"
+        android:textColor="#23A05C"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</RelativeLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="@dimen/activity_horizontal_margin">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_centerInParent="true"
+                android:id="@+id/image_user"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/bitmap_bg_player_profile_default_big"/>
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/text_username"
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            style="@style/TitleInfo"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/colorTransparent40"/>
+    <TextView
+        android:layout_marginTop="8dp"
+        android:id="@+id/text_review"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/BlackText.CategoryListText"
+        android:textSize="14sp"
+        android:text="@string/review"/>
+</LinearLayout>

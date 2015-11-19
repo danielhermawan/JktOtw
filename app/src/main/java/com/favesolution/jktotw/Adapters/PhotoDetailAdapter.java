@@ -1,6 +1,7 @@
 package com.favesolution.jktotw.Adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,7 @@ public class PhotoDetailAdapter extends RecyclerView.Adapter<PhotoDetailAdapter.
     class PhotoDetailHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         @Bind(R.id.item_image_circle) CircleImageView mImageView;
-        private String mPhotoRef;
+        private String mPhoto;
         private Context mContext;
         public PhotoDetailHolder(View itemView,Context context) {
             super(itemView);
@@ -55,15 +56,25 @@ public class PhotoDetailAdapter extends RecyclerView.Adapter<PhotoDetailAdapter.
             mContext = context;
             itemView.setOnClickListener(this);
         }
-        public void bindView(String photoRef) {
-            mPhotoRef = photoRef;
-            String url = UrlEndpoint.getPhotoUrl(mPhotoRef,
-                    (int) mContext.getResources().getDimension(R.dimen.image_photo_circle_large_width),
-                    (int) mContext.getResources().getDimension(R.dimen.image_photo_circle_large_height));
-            Glide.with(mContext)
-                    .load(url)
-                    .error(R.drawable.bitmap_placeholder)
-                    .into(mImageView);
+        public void bindView(String photo) {
+            mPhoto = photo;
+            if (!photo.equals("error")) {
+                String url;
+                if (photo.startsWith("http://favesolution.com/jktotw/")) {
+                    url = photo;
+                } else {
+                    url = UrlEndpoint.getPhotoUrl(mPhoto,
+                            (int) mContext.getResources().getDimension(R.dimen.image_photo_circle_large_width),
+                            (int) mContext.getResources().getDimension(R.dimen.image_photo_circle_large_height));
+                }
+                Glide.with(mContext)
+                        .load(url)
+                        .placeholder(R.drawable.bitmap_default_placeholder_300x300)
+                        .error(R.drawable.bitmap_placeholder)
+                        .into(mImageView);
+            } else {
+                mImageView.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.bitmap_placeholder));
+            }
         }
         @Override
         public void onClick(View v) {

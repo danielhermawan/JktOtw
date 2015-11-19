@@ -1,5 +1,6 @@
 package com.favesolution.jktotw.Networks;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -24,6 +25,10 @@ public class CustomJsonRequest extends Request<JSONObject> {
         super(Method.GET, url, errorListener);
         this.listener = reponseListener;
         this.params = params;
+        setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
     public CustomJsonRequest(int method, String url, Map<String, String> params,
@@ -31,6 +36,10 @@ public class CustomJsonRequest extends Request<JSONObject> {
         super(method, url, errorListener);
         this.listener = reponseListener;
         this.params = params;
+        setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
     protected Map<String, String> getParams()

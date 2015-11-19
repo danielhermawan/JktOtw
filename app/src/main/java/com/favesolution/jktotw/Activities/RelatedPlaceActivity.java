@@ -51,7 +51,7 @@ public class RelatedPlaceActivity extends AppCompatActivity implements GoogleApi
     private ArrayList<Place> mPlaces = new ArrayList<>();
     private SearchAdapter mAdapter;
     private static final String EXTRA_PLACE = "extra_place";
-    private String mNextToken;
+    private String mNextToken="";
     private GoogleApiClient mClient;
     private Location mCurrentLocation;
     public static Intent newIntent(Place place, Context context) {
@@ -121,7 +121,30 @@ public class RelatedPlaceActivity extends AppCompatActivity implements GoogleApi
 
     private void loadPlace() {
         if (isIndosat()) {
-
+            final String url = UrlEndpoint.getHotspot();
+            CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    JSONArray result = null;
+                    try {
+                        result = response.getJSONArray("results");
+                        mPlaces = Place.fromJsonHotspot(result, mCurrentLocation, RelatedPlaceActivity.this);
+                        mAdapter.addItems(mPlaces);
+                        showProgressBar(false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(RelatedPlaceActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                    Log.e("error", error.getMessage());
+                }
+            });
+            relatedPlaceRequest.setTag(this);
+            RequestQueueSingleton.getInstance(this)
+                    .addToRequestQueue(relatedPlaceRequest);
         } else {
             final String url = UrlEndpoint.searchNearbyPlace(mPlace.getLocation(), mPlace.getType().getCategoryFilter());
             CustomJsonRequest relatedPlaceRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
@@ -133,18 +156,19 @@ public class RelatedPlaceActivity extends AppCompatActivity implements GoogleApi
                             mNextToken = response.getString("next_page_token");
                         }
                         mPlaces = Place.fromJson(result, mCurrentLocation, RelatedPlaceActivity.this);
-                        RelatedPlaceActivity.this.startService(FetchAddressIntentService.newIntent(
+                        mAdapter.addItems(mPlaces);
+                        showProgressBar(false);
+                        /*RelatedPlaceActivity.this.startService(FetchAddressIntentService.newIntent(
                                 RelatedPlaceActivity.this,
                                 mPlaces,
                                 new ResultReceiver(new Handler()) {
                                     @Override
                                     protected void onReceiveResult(int resultCode, Bundle resultData) {
                                         mPlaces = resultData.getParcelableArrayList(FetchAddressIntentService.RESULT_DATA);
-                                        mAdapter.addItems(mPlaces);
-                                        showProgressBar(false);
+
                                     }
                                 }
-                        ));
+                        ));*/
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <array name="questions">
+        <item>@string/question_review</item>
+        <item>@string/question_related_place</item>
+    </array>
+    <array name="answers">
+        <item>@string/answer_review</item>
+        <item>@string/answer_related_place</item>
+    </array>
     <array name="categories">
         <item>@string/category_food</item>
         <item>@string/category_entertaiment</item>

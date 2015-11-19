@@ -117,10 +117,37 @@
             android:name=".Activities.RelatedPlaceActivity"
             android:label="@string/title_activity_related_place"
             android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.DetailPlaceActivity" />
         </activity>
         <activity
             android:name=".Activities.AugmentedActivity"
             android:label="@string/title_activity_augmented"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.ReviewActivity"
+            android:label="@string/title_activity_review"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.DetailPlaceActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.AddReviewActivity"
+            android:label="@string/title_activity_add_review"
+            android:theme="@style/AppTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.favesolution.jktotw.Activities.ReviewActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.HelpActivity"
+            android:label="@string/title_activity_help"
             android:theme="@style/AppTheme" >
         </activity>
     </application>

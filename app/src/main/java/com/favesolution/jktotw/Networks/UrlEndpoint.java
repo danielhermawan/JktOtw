@@ -47,8 +47,26 @@ public class UrlEndpoint {
     public static String getHotspotPhoto(String hotspotId) {
         return BASE_WEBSERVICE_URL+"image/getImagebyHotspotID/"+API_JKTOTW_KEY+"/"+hotspotId;
     }
-    public static String insertImage() {
+    public static String insertIndosatImage() {
         return BASE_WEBSERVICE_URL+"image/insertImage/"+API_JKTOTW_KEY;
+    }
+    public static String insertPlaceImage() {
+        return BASE_WEBSERVICE_URL+"image/insertImagePlace/"+API_JKTOTW_KEY;
+    }
+    public static String insertIndosatReview() {
+        return BASE_WEBSERVICE_URL+"review/insertReview/"+API_JKTOTW_KEY;
+    }
+    public static String insertPlaceReview() {
+        return BASE_WEBSERVICE_URL+"review/insertPlaceReview/"+API_JKTOTW_KEY;
+    }
+    public static String getReviewByHospot(String id) {
+        return BASE_WEBSERVICE_URL+"review/getReviewbyHotspotID/"+API_JKTOTW_KEY+"/"+id;
+    }
+    public static String getReviewByPlace(String id) {
+        return BASE_WEBSERVICE_URL+"review/getReviewbyPlaceID/"+API_JKTOTW_KEY+"/"+id;
+    }
+    public static String getPlacePhoto(String id) {
+        return BASE_WEBSERVICE_URL+"image/getImagebyPlaceID/"+API_JKTOTW_KEY+"/"+id;
     }
     public static String searchNearbyPlaceByRadius(Location location, String type,String radius) {
         if (radius == null) {

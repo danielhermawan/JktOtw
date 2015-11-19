@@ -36,7 +36,8 @@
                 android:layout_marginLeft="@dimen/activity_vertical_margin"
                 android:layout_marginTop="-32dp"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/map_place"/>
+                android:layout_below="@+id/map_place"
+                android:src="@drawable/bitmap_placeholder"/>
             <LinearLayout
                 android:id="@+id/content_info"
                 android:layout_width="wrap_content"
@@ -117,19 +118,19 @@
                     android:text="@string/call"
                     style="@style/BlackText.ButtonDetail"/>
                 <Button
-                    android:id="@+id/button_share"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableLeft="@drawable/ic_share_24dp"
-                    android:text="@string/share"
-                    style="@style/BlackText.ButtonDetail"/>
-            </LinearLayout>
-            <TextView
-                android:id="@+id/text_search_nearby"
-                android:layout_width="match_parent"
+                android:id="@+id/button_share"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/content_button"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_share_24dp"
+                android:text="@string/share"
+                style="@style/BlackText.ButtonDetail"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/text_search_nearby"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/content_button"
                 android:gravity="center"
                 android:layout_marginTop="20dp"
                 android:textColor="@color/colorPrimary"
@@ -182,6 +183,7 @@
                         android:layout_marginRight="32dp"/>
                 </RelativeLayout>
                 <RelativeLayout
+                    android:id="@+id/content_review"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
@@ -281,10 +283,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/all"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/divider1"
                 android:layout_marginTop="16dp"
                 android:layout_marginRight="16dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/divider1"
                 android:drawableRight="@drawable/ic_chevron_right_grey_24dp"
                 android:drawablePadding="8dp"/>
             <android.support.v7.widget.RecyclerView
@@ -323,9 +325,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerview_review"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/image_photo_circle_height"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_height="200dp"
                 android:layout_below="@id/text_review_number"/>
             <FrameLayout
                 android:id="@+id/divider3"

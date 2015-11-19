@@ -32,6 +32,16 @@ public class Place implements Parcelable{
     private String mPhotoRef;
     private List<String> mPhotoRefs;
     private Type mType;
+
+    public List<Review> getReviews() {
+        return mReviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        mReviews = reviews;
+    }
+
+    private List<Review> mReviews;
     public Place() {
     }
     public Location getLocation() {
@@ -189,6 +199,7 @@ public class Place implements Parcelable{
             if(jsonObject.has("international_phone_number"))
                 place.setPhoneNumber(jsonObject.getString("international_phone_number"));
             place.setName(jsonObject.getString("name"));
+            place.mId =  jsonObject.getString("place_id");
             JSONArray types = jsonObject.getJSONArray("types");
             List<Type> typeList = Type.getCategory(context);
             Type type = new Type();
@@ -254,6 +265,9 @@ public class Place implements Parcelable{
                 place.setDistance(userLocation.distanceTo(locationPlace));
                 place.setType(Type.getCategory(context).get(6));
                 place.setRating(0);
+                if(placeJson.has("FirstImage"))
+                    place.setPhotoRef(placeJson.getString("FirstImage").replace("\\/", "/"));
+
                 places.add(place);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -294,6 +308,7 @@ public class Place implements Parcelable{
         dest.writeString(this.mPhotoRef);
         dest.writeStringList(this.mPhotoRefs);
         dest.writeParcelable(this.mType, 0);
+        dest.writeTypedList(mReviews);
     }
 
     protected Place(Parcel in) {
@@ -308,6 +323,7 @@ public class Place implements Parcelable{
         this.mPhotoRef = in.readString();
         this.mPhotoRefs = in.createStringArrayList();
         this.mType = in.readParcelable(Type.class.getClassLoader());
+        this.mReviews = in.createTypedArrayList(Review.CREATOR);
     }
 
     public static final Creator<Place> CREATOR = new Creator<Place>() {

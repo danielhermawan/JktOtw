@@ -254,7 +254,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             Toast.makeText(LoginActivity.this,"Network error", Toast.LENGTH_SHORT).show();
-                            Log.e("error",error.getMessage());
+                            //Log.e("error",error.getMessage());
                             showProgress(false);
                         }
                     });

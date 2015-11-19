@@ -21,9 +21,10 @@
         android:layout_toEndOf="@id/image_place"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:textSize="17sp"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:textSize="19sp"
         style="@style/TitleInfo"/>
-    <TextView
+    <!--<TextView
         android:id="@id/text_address_place"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,5 +34,5 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:textSize="11sp"
-        style="@style/AddressInfo"/>
+        style="@style/AddressInfo"/>-->
 </RelativeLayout>
