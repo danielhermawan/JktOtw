@@ -1,5 +1,6 @@
 package com.favesolution.jktotw.Activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -107,14 +108,16 @@ public class AddReviewActivity extends AppCompatActivity {
             }
             RequestParams params = new RequestParams();
             params.put("id", mPlace.getId());
-            params.put("Review",mEditReview.getText().toString());
+            params.put("Review", mEditReview.getText().toString());
             AsyncHttpClient client = new AsyncHttpClient();
             client.addHeader("token", SharedPreference.getUserToken(this));
+            final ProgressDialog progress = ProgressDialog.show(this, "Uploading", "Upload your review", true);
             client.post(url, params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
                     try {
+                        progress.dismiss();
                         String result = response.getString("status");
                         if (result.equalsIgnoreCase("success")) {
                             Toast.makeText(AddReviewActivity.this, "Add Review Success", Toast.LENGTH_SHORT).show();
@@ -134,6 +137,7 @@ public class AddReviewActivity extends AppCompatActivity {
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     super.onFailure(statusCode, headers, responseString, throwable);
                     isAdding = false;
+                    progress.dismiss();
                     Log.e("AddReviewActivity", responseString);
                 }
             });

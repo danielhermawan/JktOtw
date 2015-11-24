@@ -188,6 +188,7 @@ public class MapPlaceFragment extends SupportMapFragment implements GoogleApiCli
     }
     private void reloadMorePlace() {
         if (!mNextToken.equals("") && !mType.getCategoryName().equals(getString(R.string.category_indosat))) {
+            Toast.makeText(getActivity(),"Load more places...",Toast.LENGTH_SHORT).show();
             String url = UrlEndpoint.loadMorePlace(mNextToken);
             CustomJsonRequest placeRequest = new CustomJsonRequest(url, null, new Response.Listener<JSONObject>() {
                 @Override

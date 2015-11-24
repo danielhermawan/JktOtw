@@ -132,7 +132,8 @@
         <activity
             android:name=".Activities.ReviewActivity"
             android:label="@string/title_activity_review"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.favesolution.jktotw.Activities.DetailPlaceActivity" />

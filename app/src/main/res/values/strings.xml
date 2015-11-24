@@ -103,4 +103,9 @@
     <string name="answer_review">You can find or add review for specific place</string>
     <string name="answer_related_place">With related place you can find other place that near place you see with the same type</string>
     <string name="more_detail">more details</string>
+    <string name="distance_value">Distance</string>
+    <string name="min_far">Distance</string>
+    <string name="max_far">Max Far</string>
+    <string name="Camera">Camera</string>
+    <string name="gallery">Gallery</string>
 </resources>

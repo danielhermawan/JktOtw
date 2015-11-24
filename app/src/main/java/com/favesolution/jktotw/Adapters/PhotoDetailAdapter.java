@@ -69,7 +69,7 @@ public class PhotoDetailAdapter extends RecyclerView.Adapter<PhotoDetailAdapter.
                 }
                 Glide.with(mContext)
                         .load(url)
-                        .placeholder(R.drawable.bitmap_default_placeholder_300x300)
+                        //.placeholder(R.drawable.bitmap_default_placeholder_300x300)
                         .error(R.drawable.bitmap_placeholder)
                         .into(mImageView);
             } else {

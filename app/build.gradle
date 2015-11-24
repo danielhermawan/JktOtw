@@ -49,4 +49,5 @@ dependencies {
     compile files('libs/beyondar-googlemap-plugin-v0.9.0.jar')
     compile files('libs/beyondar-radar-plugin-v0.9.1.jar')
     compile files('libs/beyondar-v0.9.3.jar')
+    compile 'com.cocosw:bottomsheet:1.+@aar'
 }
