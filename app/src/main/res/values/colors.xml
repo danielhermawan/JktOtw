@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#00ACC0</color>
-    <color name="colorPrimaryDark">#01579b</color>
-    <color name="colorAccent">#FFB200</color>
-    <color name="colorAccentPressed">#ffb74d</color>
+    <color name="colorPrimary">#FFC800</color>
+    <color name="colorPrimaryDark">#FF8E00</color>
+    <color name="colorAccent">#FB0000</color>
+    <color name="colorAccentPressed">#D01836</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBlack">#000000</color>
     <color name="colorTextContent">#4C4A4F</color>
-    <color name="colorButtonLogin">#00E47C</color>
-    <color name="colorButtonLoginPressed">#69f0ae</color>
+    <color name="colorButtonLogin">#FB0000</color>
+    <color name="colorButtonLoginPressed">#D01836</color>
     <color name="colorNavigationIcon">#A5E2DB</color>
     <color name="colorTransparent">#00000000</color>
     <color name="colorTransparent40">#66000000</color>
