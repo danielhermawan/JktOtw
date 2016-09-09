@@ -1,4 +1,8 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+apply plugin: 'realm-android'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 24
@@ -10,6 +14,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -17,39 +25,65 @@ android {
         }
     }
 }
+
 repositories {
     maven {url "https://clojars.org/repo/"}
-    mavenCentral()
-    jcenter()
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    //Test Library
     testCompile 'junit:junit:4.12'
-    compile "org.parceler:parceler-api:1.0.4"
+    testCompile 'org.robolectric:robolectric:3.0'
+
+    //UI Library
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.android.support:design:24.2.0'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.marshalchen.ultimaterecyclerview:library:0.3.11'
+    compile 'com.cocosw:bottomsheet:1.3.0@aar'
 
+    //Play Service Library
     compile 'com.google.android.gms:play-services-location:9.4.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'com.google.android.gms:play-services-places:9.4.0'
 
-    compile 'com.android.support:design:24.2.0'
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.github.bumptech.glide:glide:3.6.1'
-    compile 'com.mcxiaoke.volley:library:1.0.19'
-    compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'frankiesardo:icepick:3.1.0'
-    provided 'frankiesardo:icepick-processor:3.1.0'
-    compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
-    compile 'de.hdodenhof:circleimageview:2.0.0'
-    compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile 'com.loopj.android:android-async-http:1.4.9'
+    //Utils Library
+    compile 'com.jakewharton:butterknife:8.2.1'
+    apt 'com.jakewharton:butterknife-compiler:8.2.1'
+    compile 'frankiesardo:icepick:3.2.0'
+    provided 'frankiesardo:icepick-processor:3.2.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    apt 'com.google.dagger:dagger-compiler:2.5'
+    compile 'com.google.dagger:dagger:2.5'
+    provided 'javax.annotation:jsr250-api:1.0'
+
+    //Network and model library
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'io.reactivex:rxjava:1.1.9'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile 'com.facebook.stetho:stetho:1.3.1'
+    compile 'com.facebook.stetho:stetho-okhttp3:1.3.1'
+
+    //Augmented Reality library
     compile files('libs/beyondar-googlemap-plugin-v0.9.0.jar')
     compile files('libs/beyondar-radar-plugin-v0.9.1.jar')
     compile files('libs/beyondar-v0.9.3.jar')
-    compile 'com.cocosw:bottomsheet:1.3.0@aar'
+
+    //Trash library
+    compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
+    compile "org.parceler:parceler-api:1.0.4"
+    compile 'com.google.maps.android:android-maps-utils:0.4'
     compile 'com.github.bumptech.glide:okhttp-integration:1.3.1@aar'
+
+    //todo:gonnna be change library
+    compile 'com.mcxiaoke.volley:library:1.0.19'
+    compile 'com.loopj.android:android-async-http:1.4.9'
 }
